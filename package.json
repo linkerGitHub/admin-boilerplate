@@ -8,17 +8,31 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "axios": "^0.19.2",
     "core-js": "^3.6.4",
-    "vue": "^2.6.11"
+    "element-ui": "^2.13.0",
+    "vue": "^2.6.11",
+    "vue-router": "^3.1.6",
+    "vuex": "^3.1.3"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.2.0",
     "@vue/cli-plugin-eslint": "^4.2.0",
     "@vue/cli-service": "^4.2.0",
+    "babel-core": "^6.26.3",
     "babel-eslint": "^10.0.3",
-    "eslint": "^6.7.2",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-friendly-formatter": "^4.0.1",
+    "eslint-loader": "^3.0.3",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
     "eslint-plugin-vue": "^6.1.2",
-    "vue-template-compiler": "^2.6.11"
+    "mocha": "^7.1.1",
+    "vue-template-compiler": "^2.6.11",
+    "vuese": "^1.4.7"
   },
   "eslintConfig": {
     "root": true,
@@ -26,13 +40,22 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/essential",
+      "plugin:vue/strongly-recommended",
       "eslint:recommended"
     ],
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {}
+    "rules": {
+      "vue/script-indent": "error",
+      "vue/no-deprecated-scope-attribute": "error",
+      "vue/no-deprecated-slot-attribute": "error",
+      "vue/no-deprecated-slot-scope-attribute": "error",
+      "vue/no-irregular-whitespace": "error",
+      "vue/no-reserved-component-names": "error",
+      "semi": ["error", "never"],
+      "prefer-const": "error"
+    }
   },
   "browserslist": [
     "> 1%",
