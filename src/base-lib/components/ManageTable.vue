@@ -193,9 +193,14 @@ export default {
       default: (res) => {
         return res.data.total
       }
-    }
+    },
+    /**
+     * 数据源url
+     */
+
   },
   components: {
+    // 渲染函数
     VNodeRender: {
       props: {
         genVNode: {
@@ -225,24 +230,31 @@ export default {
       innerComponentStatus: {
         // 列筛选栏的弹出框显示状态
         colShowSetting: {
+          // 是否显示列显示筛选
           popoverVisibility: false,
+          // 权限状态标记
           checkAllIndeterminate: false,
           checkAll: true
         },
+        //
         tableColShowFlag: {},
         table: {
+          // 初始loading为true
           loading: true,
+          // 表格多选选中的id
           selected: []
         },
+        // 翻页状态
         pagination: {
+          // 当前页码
           currentPage: 1
         }
       },
+      // sourceData，表格的数据
       sourceData: testData.sourceData,
       // 使用回调创建工厂函数准备方法
       methodsReady: {
-        colShowSettingCheckAllHandle: withCallbackFuncBuilder
-          .New()
+        colShowSettingCheckAllHandle: withCallbackFuncBuilder.New()
           .setBeforeSyncPromise(this.colShowCheckAllBeforeSync)
           .setMainFunc(val => {
             this.columnsDefinition.forEach((item, index) => {
@@ -250,8 +262,7 @@ export default {
             })
             this.innerComponentStatus.colShowSetting.checkAllIndeterminate = false
           }).buildFunc(),
-        colShowSettingCheckOneHandle: withCallbackFuncBuilder
-          .New()
+        colShowSettingCheckOneHandle: withCallbackFuncBuilder.New()
           .setBeforeSyncPromise(this.colShowCheckOneBeforeSync)
           .setMainFunc((val, index) => {
             this.tableColShowFlag[index] = val
@@ -295,6 +306,11 @@ export default {
     currentPageChangeHandle(val) {
       this.innerComponentStatus.pagination.currentPage = val
       // TODO 翻页后，触发数据请求
+    },
+    // 请求数据
+    formDataRequest() {
+      // TODO 生成请求url，通过buildRequestUrl prop来进行
+
     }
   },
   computed: {
@@ -312,7 +328,7 @@ export default {
     }
   },
   watch: {
-    // gen ju
+    // TODO 根据columnDefinition配置相应字段的初始显示状态，目前是全部开启的，后续需要修改再补充
     columnsDefinition: function () {
       this.columnsDefinition.forEach((item, index) => {
         this.$set(this.innerComponentStatus.tableColShowFlag, index, true)

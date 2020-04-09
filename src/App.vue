@@ -1,13 +1,19 @@
 <template>
-  <manage-table :columns-definition="def" />
+  <div>
+    <skeleton-main>
+      <manage-table :columns-definition="def" />
+    </skeleton-main>
+  </div>
 </template>
 
 <script>
 
 import ManageTable from "./base-lib/components/ManageTable"
+import SkeletonMain from "./base-lib/components/skeleton/SkeletonMain"
 export default {
   name: 'App',
   components: {
+    SkeletonMain,
     ManageTable
   },
   data() {
