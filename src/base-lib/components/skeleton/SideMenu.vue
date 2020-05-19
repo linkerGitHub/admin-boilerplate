@@ -8,14 +8,14 @@
       :key="menu.name"
     >
       <el-menu-item
-        :index="menu.name"
         v-if="menu.children === undefined || menu.children.length === 0"
+        :index="menu.name"
       >
         {{ menu.title }}
       </el-menu-item>
       <side-menu
-        :menus="menu"
         v-if="menu.children !== undefined && menu.children.length > 0"
+        :menus="menu"
       />
     </div>
   </el-submenu>

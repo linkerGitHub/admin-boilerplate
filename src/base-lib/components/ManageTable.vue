@@ -89,13 +89,13 @@
     <el-row :style="{'padding-top': '10px'}">
       <el-pagination
         background
-        @size-change="pageSizeChangeHandle"
-        @current-change="currentPageChangeHandle"
         :current-page="innerComponentStatus.pagination.currentPage"
         :page-sizes="propPagination.pageSizes"
         :page-size.sync="propPagination.pageSize"
         layout="total, sizes, prev, pager, next"
         :total="paginationTotalPage"
+        @size-change="pageSizeChangeHandle"
+        @current-change="currentPageChangeHandle"
       />
     </el-row>
   </div>
@@ -105,9 +105,35 @@
 import withCallbackFuncBuilder from "./utils/with-callback-func-builder"
 import tableDataProcessor from "../utils/table-data-processor"
 import testData from "./testData"
+import RestfulReq from "./utils/restful-req"
 
 export default {
   name: "ManageTable",
+  components: {
+    // 渲染函数
+    VNodeRender: {
+      props: {
+        genVNode: {
+          type: Object | Function
+        },
+        col: {
+          type: Object,
+          default: {}
+        },
+        scope: {
+          type: Object
+        }
+      },
+      render: function (createElement) {
+        if (this.genVNode.constructor === 'Object') {
+          return this.genVNode
+        }
+        if (this.genVNode.constructor === 'Function') {
+          return this.genVNode(createElement, this.scope.row[this.col.prop], this.col, this.scope)
+        }
+      }
+    }
+  },
   props: {
     // 是否显示顶部列显示筛选栏
     enableColShowSetting: {
@@ -197,31 +223,9 @@ export default {
     /**
      * 数据源url
      */
-
-  },
-  components: {
-    // 渲染函数
-    VNodeRender: {
-      props: {
-        genVNode: {
-          type: Object | Function
-        },
-        col: {
-          type: Object,
-          default: {}
-        },
-        scope: {
-          type: Object
-        }
-      },
-      render: function (createElement) {
-        if (this.genVNode.constructor === 'Object') {
-          return this.genVNode
-        }
-        if (this.genVNode.constructor === 'Function') {
-          return this.genVNode(createElement, this.scope.row[this.col.prop], this.col, this.scope)
-        }
-      }
+    dataSrcUrl: {
+      type: String,
+      required: true
     }
   },
   data() {
@@ -250,6 +254,7 @@ export default {
           currentPage: 1
         }
       },
+      request: new RestfulReq(),
       // sourceData，表格的数据
       sourceData: testData.sourceData,
       // 使用回调创建工厂函数准备方法
@@ -281,6 +286,37 @@ export default {
       }
     }
   },
+  computed: {
+    // 根据column的定义计算出可以被显示在表格中的列
+    visibleColumnDefinition: function () {
+      return tableDataProcessor.searchTableData(function (item) {
+        return item.visible !== false
+      }, this.columnsDefinition)
+    },
+    tableData: function () {
+      return this.getTableDataFromResponse(this.sourceData)
+    },
+    paginationTotalPage: function () {
+      return this.getTotalPageFromResponse(this.sourceData)
+    }
+  },
+  watch: {
+    // TODO 根据columnDefinition配置相应字段的初始显示状态，目前是全部开启的，后续需要修改再补充
+    columnsDefinition: function () {
+      this.columnsDefinition.forEach((item, index) => {
+        this.$set(this.innerComponentStatus.tableColShowFlag, index, true)
+      })
+    },
+    dataSrcUrl: {
+      handler(val) {
+        this.request.setReqUrl(val)
+        this.request.reqGet().then(res => {
+          console.log(res)
+        })
+      },
+      immediate: true
+    }
+  },
   methods: {
     // 列筛选栏全选checkbox勾选或取消的处理
     colShowSettingCheckAllHandle(...args) {
@@ -309,29 +345,9 @@ export default {
     },
     // 请求数据
     formDataRequest() {
-      // TODO 生成请求url，通过buildRequestUrl prop来进行
-
-    }
-  },
-  computed: {
-    // 根据column的定义计算出可以被显示在表格中的列
-    visibleColumnDefinition: function () {
-      return tableDataProcessor.searchTableData(function (item) {
-        return item.visible !== false
-      }, this.columnsDefinition)
-    },
-    tableData: function () {
-      return this.getTableDataFromResponse(this.sourceData)
-    },
-    paginationTotalPage: function () {
-      return this.getTotalPageFromResponse(this.sourceData)
-    }
-  },
-  watch: {
-    // TODO 根据columnDefinition配置相应字段的初始显示状态，目前是全部开启的，后续需要修改再补充
-    columnsDefinition: function () {
-      this.columnsDefinition.forEach((item, index) => {
-        this.$set(this.innerComponentStatus.tableColShowFlag, index, true)
+      // TODO 使用生成请求url，通过requestUrlBuilder prop来进行
+      this.request.reqGet().then(res => {
+        console.log(res)
       })
     }
   }

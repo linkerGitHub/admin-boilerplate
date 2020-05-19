@@ -1,0 +1,22 @@
+@--primary-color: #AE0001;
+@deep: ~">>>";
+.predefine-primary-color{
+  color: @--primary-color;
+}
+.predefine-primary-bgcolor{
+  background-color: @--primary-color;
+}
+.seg-part @{deep} {
+  .el-tabs__item {
+    font-family: PingFang SC;
+    color: rgba(64, 64, 64, 1);
+    font-size: 18px;
+    font-weight: 400;
+  }
+  .el-tabs__item.is-active{
+    font-weight: bold;
+  }
+  .el-tabs__nav-wrap::after {
+    background-color: transparent;
+  }
+}
