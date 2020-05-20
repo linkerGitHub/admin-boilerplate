@@ -90,8 +90,8 @@
       <el-pagination
         background
         :current-page="innerComponentStatus.pagination.currentPage"
-        :page-sizes="propPagination.pageSizes"
-        :page-size.sync="propPagination.pageSize"
+        :page-sizes="innerComponentStatus.pagination.pageSizes"
+        :page-size.sync="innerComponentStatus.pagination.pageSize"
         layout="total, sizes, prev, pager, next"
         :total="paginationTotalPage"
         @size-change="pageSizeChangeHandle"
@@ -102,13 +102,13 @@
 </template>
 
 <script>
-import withCallbackFuncBuilder from "./utils/with-callback-func-builder"
-import tableDataProcessor from "../utils/table-data-processor"
-import testData from "./testData"
-import RestfulReq from "./utils/restful-req"
+import withCallbackFuncBuilder from './utils/with-callback-func-builder'
+import tableDataProcessor from '../utils/table-data-processor'
+import testData from './testData'
+import RestfulReq from './utils/restful-req'
 
 export default {
-  name: "ManageTable",
+  name: 'ManageTable',
   components: {
     // 渲染函数
     VNodeRender: {
@@ -178,7 +178,7 @@ export default {
           value.forEach(function (element) {
             if (element.prop === undefined || element.label === undefined) {
               throw new Error(
-                "使用TheManageTable组件时，column内prop属性和label属性是必须的"
+                '使用TheManageTable组件时，column内prop属性和label属性是必须的'
               )
             }
           })
@@ -197,7 +197,7 @@ export default {
       type: Object,
       default() {
         return {
-          pageSizes: [5, 20, 50, 100, 300, 500],
+          pageSizes: [5, 10, 20, 50, 100, 300, 500],
           pageSize: 10
         }
       }
@@ -208,7 +208,7 @@ export default {
     getTableDataFromResponse: {
       type: Function,
       default: (res) => {
-        return res.data.rows
+        return res.data.data ? res.data.data.rows : []
       }
     },
     /**
@@ -217,7 +217,7 @@ export default {
     getTotalPageFromResponse: {
       type: Function,
       default: (res) => {
-        return res.data.total
+        return res.data.data ? res.data.data.num.all : 0
       }
     },
     /**
@@ -226,7 +226,21 @@ export default {
     dataSrcUrl: {
       type: String,
       required: true
+    },
+    /**
+     * 构建网络请求器
+     */
+    axiosRequester: {
+      validator: function(val) {
+        return val.constructor === RestfulReq
+      },
+      default () {
+        return new RestfulReq()
+      }
     }
+  },
+  mounted() {
+    this.innerComponentStatus.pagination = Object.assign(this.innerComponentStatus.pagination, this.propPagination)
   },
   data() {
     return {
@@ -251,10 +265,11 @@ export default {
         // 翻页状态
         pagination: {
           // 当前页码
-          currentPage: 1
+          currentPage: 1,
+          pageSizes: [5, 20, 50, 100, 300, 500],
+          pageSize: 10
         }
       },
-      request: new RestfulReq(),
       // sourceData，表格的数据
       sourceData: testData.sourceData,
       // 使用回调创建工厂函数准备方法
@@ -309,10 +324,8 @@ export default {
     },
     dataSrcUrl: {
       handler(val) {
-        this.request.setReqUrl(val)
-        this.request.reqGet().then(res => {
-          console.log(res)
-        })
+        this.axiosRequester.setReqUrl(val)
+        this.formDataRequest()
       },
       immediate: true
     }
@@ -335,23 +348,27 @@ export default {
     pageSizeChangeHandle(val) {
       const pagination = this.innerComponentStatus.pagination
       pagination.currentPage = 1
-      this.propPagination.pageSize = val
-      // TODO 更新翻页配置后，重新数据请求
+      this.innerComponentStatus.pagination.pageSize = val
+      this.formDataRequest()
     },
     // 翻页事件处理
     currentPageChangeHandle(val) {
       this.innerComponentStatus.pagination.currentPage = val
-      // TODO 翻页后，触发数据请求
+      this.formDataRequest()
     },
     // 请求数据
     formDataRequest() {
-      // TODO 使用生成请求url，通过requestUrlBuilder prop来进行
-      this.request.reqGet().then(res => {
-        console.log(res)
+      this.innerComponentStatus.table.loading = true
+      const pagination = this.innerComponentStatus.pagination
+      this.axiosRequester.reqGet({
+        skip: (pagination.currentPage - 1) * pagination.pageSize,
+        take: pagination.pageSize
+      }).then(res => {
+        this.sourceData = res
+        this.innerComponentStatus.table.loading = false
       })
     }
   }
-  // TODO 网络请求处理
 }
 </script>
 

@@ -23,7 +23,7 @@
 
 <script>
 export default {
-  name: "SideMenu",
+  name: 'SideMenu',
   props: {
     menus: {
       type: Object,

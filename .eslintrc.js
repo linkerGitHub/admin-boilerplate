@@ -24,6 +24,8 @@ module.exports = {
     "indent": [
       "error",
       2
-    ]
+    ],
+    "quotes": ["error", "single"],
+    "compat/compat":"warn"
   },
 };

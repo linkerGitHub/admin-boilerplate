@@ -10,9 +10,26 @@
       </el-menu>
     </el-aside>
     <el-container>
-      <el-header>Header</el-header>
+      <!--      <el-header>Header</el-header>-->
       <el-main>
-        <slot />
+        <el-tabs
+          v-model="activeTab"
+          type="card"
+          closable
+          @tab-click="tabClickHandle"
+          @tab-remove="removeTab"
+        >
+          <el-tab-pane
+            v-for="(item) in existTabs"
+            :key="item.name"
+            :label="item.title"
+            :name="item.name"
+          >
+            <keep-alive>
+              <router-view />
+            </keep-alive>
+          </el-tab-pane>
+        </el-tabs>
       </el-main>
       <el-footer>Footer</el-footer>
     </el-container>
@@ -21,13 +38,59 @@
 
 <script>
 import menuRoutes from '../../../route/menu-routes'
-import SideMenu from "./SideMenu"
+import SideMenu from './SideMenu'
 export default {
-  name: "SkeletonMain",
+  name: 'SkeletonMain',
   components: {SideMenu},
+
   data() {
     return {
-      menuRoutes
+      menuRoutes,
+      existTabs: [],
+      existTabsMap: {},
+      activeTab: ''
+    }
+  },
+  watch: {
+    $route: function (newVal) {  //注意两个参数的位置
+      const tab = this.buildTabFromRoute(newVal)
+      this.addTab(tab)
+    }
+  },
+  beforeMount() {
+    const tab = this.buildTabFromRoute(this.$route)
+    this.addTab(tab)
+  },
+  methods: {
+    buildTabFromRoute(route) {
+      return {
+        name: route.path,
+        title: route.meta.title,
+        meta: route.meta
+      }
+    },
+    addTab(tab) {
+      if(this.existTabsMap[tab.name] === undefined) {
+        this.existTabs.push(tab)
+        this.$set(this.existTabsMap, tab.name, tab)
+      }
+      this.activeTab = tab.name
+    },
+    removeTab(name) {
+      this.$delete(this.existTabsMap, name)
+      this.existTabs = this.existTabs.filter(item => {
+        return item.name !== name
+      })
+      const nextTab = this.existTabs[this.existTabs.length - 1]
+      this.jumpToTab(nextTab)
+    },
+    jumpToTab(tab) {
+      this.$router.push({
+        path: tab.name
+      })
+    },
+    tabClickHandle(tab) {
+      this.jumpToTab(tab)
     }
   }
 }
