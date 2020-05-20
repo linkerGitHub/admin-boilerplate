@@ -26,7 +26,9 @@
             :name="item.name"
           >
             <keep-alive>
-              <router-view />
+              <div style="position: relative">
+                <router-view />
+              </div>
             </keep-alive>
           </el-tab-pane>
         </el-tabs>

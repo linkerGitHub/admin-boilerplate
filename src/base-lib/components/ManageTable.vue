@@ -98,11 +98,43 @@
         @current-change="currentPageChangeHandle"
       />
     </el-row>
+    <el-dialog
+      title="新建"
+      :visible.sync="dialogStatus.newOne"
+    >
+      <el-form
+        :model="innerFormDataTemp.newOne"
+        :rules="formRule"
+        :label-width="labelWidthAuto"
+      >
+        <slot name="newOneForm">
+          <el-form-item
+            v-for="(field, index) in editableField"
+            :key="index"
+            :label="field.label"
+          >
+            <el-input v-model="innerFormDataTemp.edit[field.prop]" />
+          </el-form-item>
+        </slot>
+      </el-form>
+      <template v-slot:footer>
+        <div>
+          <el-button @click="dialogStatus.newOne = false">
+            取 消
+          </el-button>
+          <el-button
+            type="primary"
+            @click="newOneFormConfirmHandle"
+          >
+            确 定
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import withCallbackFuncBuilder from './utils/with-callback-func-builder'
 import tableDataProcessor from '../utils/table-data-processor'
 import testData from './testData'
 import RestfulReq from './utils/restful-req'
@@ -138,7 +170,9 @@ export default {
     // 是否显示顶部列显示筛选栏
     enableColShowSetting: {
       type: Boolean,
-      default: true
+      default() {
+        return true
+      }
     },
     // 钩子函数，列筛选栏全选按钮预定动作开始前的回调，必须返回一个promise
     colShowCheckAllBeforeSync: {
@@ -239,11 +273,16 @@ export default {
       }
     }
   },
-  mounted() {
-    this.innerComponentStatus.pagination = Object.assign(this.innerComponentStatus.pagination, this.propPagination)
-  },
   data() {
     return {
+      innerFormDataTemp: {
+        edit: {},
+        newOne: {}
+      },
+      dialogStatus: {
+        newOne: false,
+        edit: false
+      },
       // 组件内部的一些状态
       innerComponentStatus: {
         // 列筛选栏的弹出框显示状态
@@ -271,34 +310,7 @@ export default {
         }
       },
       // sourceData，表格的数据
-      sourceData: testData.sourceData,
-      // 使用回调创建工厂函数准备方法
-      methodsReady: {
-        colShowSettingCheckAllHandle: withCallbackFuncBuilder.New()
-          .setBeforeSyncPromise(this.colShowCheckAllBeforeSync)
-          .setMainFunc(val => {
-            this.columnsDefinition.forEach((item, index) => {
-              this.$set(this.tableColShowFlag, index, val)
-            })
-            this.innerComponentStatus.colShowSetting.checkAllIndeterminate = false
-          }).buildFunc(),
-        colShowSettingCheckOneHandle: withCallbackFuncBuilder.New()
-          .setBeforeSyncPromise(this.colShowCheckOneBeforeSync)
-          .setMainFunc((val, index) => {
-            this.tableColShowFlag[index] = val
-            let trueCount = 0
-            let falseCount = 0
-            for (const colState in this.tableColShowFlag) {
-              trueCount += this.tableColShowFlag[colState] ? 1 : 0
-              falseCount += this.tableColShowFlag[colState] ? 0 : 1
-            }
-            const colShowSetting = this.innerComponentStatus.colShowSetting
-            colShowSetting.checkAll = falseCount === 0
-            colShowSetting.checkAllIndeterminate = !(
-              trueCount === 0 || falseCount === 0
-            )
-          }).buildFunc()
-      }
+      sourceData: testData.sourceData
     }
   },
   computed: {
@@ -313,6 +325,28 @@ export default {
     },
     paginationTotalPage: function () {
       return this.getTotalPageFromResponse(this.sourceData)
+    },
+    formRule: function () {
+      const ret = {}
+      this.columnsDefinition.forEach(item => {
+        ret[item.prop] = item.validRule
+      })
+      return ret
+    },
+    editableField: function () {
+      return this.columnsDefinition.filter(item => {
+        return item.editable
+      })
+    },
+    labelWidthAuto: function () {
+      let width = 36
+      this.columnsDefinition.forEach(item => {
+        const tmp = item.label.length * 18
+        if(tmp > width) {
+          width = tmp
+        }
+      })
+      return width + 'px'
     }
   },
   watch: {
@@ -330,15 +364,22 @@ export default {
       immediate: true
     }
   },
+  mounted() {
+    this.innerComponentStatus.pagination = Object.assign(this.innerComponentStatus.pagination, this.propPagination)
+  },
   methods: {
+    newOneFormConfirmHandle() {
+    },
     // 列筛选栏全选checkbox勾选或取消的处理
+    // eslint-disable-next-line no-unused-vars
     colShowSettingCheckAllHandle(...args) {
-      this.methodsReady.colShowSettingCheckAllHandle(args)
+
     },
 
     // 列筛选栏非全选的checkbox勾选或取消的处理
+    // eslint-disable-next-line no-unused-vars
     colShowSettingCheckOneHandle(...args) {
-      this.methodsReady.colShowSettingCheckOneHandle(args)
+
     },
     // 表格多选勾选事件处理
     tableSelectChangeHandle(val) {

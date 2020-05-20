@@ -17,11 +17,13 @@ export default {
       def: [
         {
           prop: 'adminName',
-          label: '用户名'
+          label: '用户名',
+          editable: true
         },
         {
           prop: 'adminPass',
-          label: '密码'
+          label: '密码',
+          editable: true
         }
       ]
     }
