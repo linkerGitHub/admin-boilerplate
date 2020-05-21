@@ -31,9 +31,10 @@
             </div>
           </div>
           <el-button
-            v-slot:reference
+            slot="reference"
             type="primary"
             :plain="true"
+            size="small"
             icon="el-icon-setting"
           >
             显示
@@ -157,10 +158,10 @@ export default {
         }
       },
       render: function (createElement) {
-        if (this.genVNode.constructor === 'Object') {
+        if (this.genVNode.constructor === Object) {
           return this.genVNode
         }
-        if (this.genVNode.constructor === 'Function') {
+        if (this.genVNode.constructor === Function) {
           return this.genVNode(createElement, this.scope.row[this.col.prop], this.col, this.scope)
         }
       }
@@ -192,17 +193,17 @@ export default {
       }
     },
     /** 对应table data在显示时各个列的情况定义
-     * 选项说明：
-     * prop:   字符串，必须，表示要输出的值的键
-     * label:  字符串，必须，表示该列显示在表头的值
-     * className: 为该列自定义的class
-     * width: 定义该列的显示宽度
-     * textContent: 文本内容生成回调函数，参数是当前行列的值，当前列定义，当前所在行的整行值，以文本插值的形式输出
-     * htmlContent: html内容生成回调函数，参数是当前行列的值，当前列定义，当前所在行的整行值，以HTML的形式输出
-     * nodeExpress: VNode生成回调函数，参数是渲染函数createElement，参数是当前行列的值，当前所在行的整行值，以HTML的形式输出
-     * textContent, htmlContent, nodeExpress三者只能选一个，若同时存在，使用优先顺序textContent > htmlContent > nodeExpress
-     * 若三者都不选用将直接显示值
-     **/
+       * 选项说明：
+       * prop:   字符串，必须，表示要输出的值的键
+       * label:  字符串，必须，表示该列显示在表头的值
+       * className: 为该列自定义的class
+       * width: 定义该列的显示宽度
+       * textContent: 文本内容生成回调函数，参数是当前行列的值，当前列定义，当前所在行的整行值，以文本插值的形式输出
+       * htmlContent: html内容生成回调函数，参数是当前行列的值，当前列定义，当前所在行的整行值，以HTML的形式输出
+       * nodeExpress: VNode生成回调函数，参数是渲染函数createElement，当前行列的值，当前所在行的整行值，以VNode节点的形式输出
+       * textContent, htmlContent, nodeExpress三者只能选一个，若同时存在，使用优先顺序textContent > htmlContent > nodeExpress
+       * 若三者都不选用将直接显示值
+       **/
     columnsDefinition: {
       type: Array,
       required: true,
@@ -223,10 +224,10 @@ export default {
       }
     },
     /**
-     * 指定翻页配置，选项说明，返回的对象应该包含
-     * pageSizes: 每页显示个数选择器的选项设置
-     * pageSize: 每页显示条目个数
-     */
+       * 指定翻页配置，选项说明，返回的对象应该包含
+       * pageSizes: 每页显示个数选择器的选项设置
+       * pageSize: 每页显示条目个数
+       */
     propPagination: {
       type: Object,
       default() {
@@ -237,8 +238,8 @@ export default {
       }
     },
     /**
-     * 从数据源中取得tabledata部分的数据
-     */
+       * 从数据源中取得tabledata部分的数据
+       */
     getTableDataFromResponse: {
       type: Function,
       default: (res) => {
@@ -246,8 +247,8 @@ export default {
       }
     },
     /**
-     * 从数据源中取得总页数
-     */
+       * 从数据源中取得总页数
+       */
     getTotalPageFromResponse: {
       type: Function,
       default: (res) => {
@@ -255,15 +256,15 @@ export default {
       }
     },
     /**
-     * 数据源url
-     */
+       * 数据源url
+       */
     dataSrcUrl: {
       type: String,
       required: true
     },
     /**
-     * 构建网络请求器
-     */
+       * 构建网络请求器
+       */
     axiosRequester: {
       validator: function(val) {
         return val.constructor === RestfulReq
@@ -364,6 +365,12 @@ export default {
       immediate: true
     }
   },
+  beforeMount() {
+    const thisView = this
+    this.columnsDefinition.forEach(function (item, index) {
+      thisView.$set(thisView.innerComponentStatus.tableColShowFlag, index, true)
+    })
+  },
   mounted() {
     this.innerComponentStatus.pagination = Object.assign(this.innerComponentStatus.pagination, this.propPagination)
   },
@@ -372,14 +379,26 @@ export default {
     },
     // 列筛选栏全选checkbox勾选或取消的处理
     // eslint-disable-next-line no-unused-vars
-    colShowSettingCheckAllHandle(...args) {
-
+    colShowSettingCheckAllHandle(val) {
+      const thisView = this
+      this.columnsDefinition.forEach(function (item, index) {
+        thisView.$set(thisView.innerComponentStatus.tableColShowFlag, index, val)
+      })
+      this.innerComponentStatus.colShowSetting.checkAllIndeterminate = false
     },
 
     // 列筛选栏非全选的checkbox勾选或取消的处理
     // eslint-disable-next-line no-unused-vars
-    colShowSettingCheckOneHandle(...args) {
-
+    colShowSettingCheckOneHandle(val, index) {
+      this.innerComponentStatus.tableColShowFlag[index] = val
+      let trueCount = 0
+      let falseCount = 0
+      for (let colState in this.innerComponentStatus.tableColShowFlag) {
+        trueCount += this.innerComponentStatus.tableColShowFlag[colState] ? 1 : 0
+        falseCount += this.innerComponentStatus.tableColShowFlag[colState] ? 0 : 1
+      }
+      this.innerComponentStatus.colShowSetting.checkAll = (falseCount === 0)
+      this.innerComponentStatus.colShowSetting.checkAllIndeterminate = !(trueCount === 0 || falseCount === 0)
     },
     // 表格多选勾选事件处理
     tableSelectChangeHandle(val) {
@@ -413,4 +432,10 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped lang="less">
+  .manage-table-box @{deep} {
+    .col-hide {
+      display: none;
+    }
+  }
+</style>
