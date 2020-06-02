@@ -25,11 +25,11 @@
             :label="item.title"
             :name="item.name"
           >
-            <keep-alive>
-              <div style="position: relative">
+            <div style="position: relative">
+              <keep-alive>
                 <router-view />
-              </div>
-            </keep-alive>
+              </keep-alive>
+            </div>
           </el-tab-pane>
         </el-tabs>
       </el-main>
@@ -84,7 +84,9 @@ export default {
         return item.name !== name
       })
       const nextTab = this.existTabs[this.existTabs.length - 1]
-      this.jumpToTab(nextTab)
+      if(this.activeTab === name) {
+        this.jumpToTab(nextTab)
+      }
     },
     jumpToTab(tab) {
       this.$router.push({

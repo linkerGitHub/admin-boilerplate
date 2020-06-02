@@ -1,9 +1,9 @@
 <template>
   <div class="manage-table-box">
-    <el-row>
+    <el-row style="padding: 10px 0 20px 0">
       <el-col
         v-if="enableColShowSetting"
-        :span="3"
+        :span="2"
       >
         <el-popover
           v-model="innerComponentStatus.colShowSetting.popoverVisibility"
@@ -41,7 +41,36 @@
           </el-button>
         </el-popover>
       </el-col>
-      <el-col :span="20">
+      <el-col :span="5">
+        <div>
+          <el-button
+            circle
+            icon="el-icon-plus"
+            size="small"
+            @click="dialogStatus.newOne = true"
+          />
+          <el-button
+            circle
+            type="primary"
+            icon="el-icon-edit"
+            size="small"
+            @click="callEditDialog"
+          />
+          <el-button
+            circle
+            type="success"
+            icon="el-icon-refresh"
+            size="small"
+          />
+          <el-button
+            circle
+            type="danger"
+            icon="el-icon-delete"
+            size="small"
+          />
+        </div>
+      </el-col>
+      <el-col :span="16">
         <slot name="searchBar" />
       </el-col>
     </el-row>
@@ -50,7 +79,7 @@
       :data="tableData"
       border
       style="width: 100%"
-      @select-change="tableSelectChangeHandle"
+      @selection-change="tableSelectChangeHandle"
     >
       <el-table-column
         type="selection"
@@ -90,6 +119,7 @@
     <el-row :style="{'padding-top': '10px'}">
       <el-pagination
         background
+        hide-on-single-page
         :current-page="innerComponentStatus.pagination.currentPage"
         :page-sizes="innerComponentStatus.pagination.pageSizes"
         :page-size.sync="innerComponentStatus.pagination.pageSize"
@@ -114,7 +144,7 @@
             :key="index"
             :label="field.label"
           >
-            <el-input v-model="innerFormDataTemp.edit[field.prop]" />
+            <el-input v-model="innerFormDataTemp.newOne[field.prop]" />
           </el-form-item>
         </slot>
       </el-form>
@@ -132,13 +162,45 @@
         </div>
       </template>
     </el-dialog>
+    <el-dialog
+      title="编辑"
+      :visible.sync="dialogStatus.edit"
+    >
+      <el-form
+        :model="innerFormDataTemp.edit"
+        :rules="formRule"
+        :label-width="labelWidthAuto"
+      >
+        <slot name="editForm">
+          <el-form-item
+            v-for="(field, index) in editableField"
+            :key="index"
+            :label="field.label"
+          >
+            <el-input v-model="innerFormDataTemp.edit[field.prop]" />
+          </el-form-item>
+        </slot>
+      </el-form>
+      <template v-slot:footer>
+        <div>
+          <el-button @click="dialogStatus.edit = false">
+            取 消
+          </el-button>
+          <el-button
+            type="primary"
+            @click="editOneFormConfirmHandle"
+          >
+            确 定
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import tableDataProcessor from '../utils/table-data-processor'
-import testData from './testData'
-import RestfulReq from './utils/restful-req'
+import Axios from 'axios'
 
 export default {
   name: 'ManageTable',
@@ -193,17 +255,17 @@ export default {
       }
     },
     /** 对应table data在显示时各个列的情况定义
-       * 选项说明：
-       * prop:   字符串，必须，表示要输出的值的键
-       * label:  字符串，必须，表示该列显示在表头的值
-       * className: 为该列自定义的class
-       * width: 定义该列的显示宽度
-       * textContent: 文本内容生成回调函数，参数是当前行列的值，当前列定义，当前所在行的整行值，以文本插值的形式输出
-       * htmlContent: html内容生成回调函数，参数是当前行列的值，当前列定义，当前所在行的整行值，以HTML的形式输出
-       * nodeExpress: VNode生成回调函数，参数是渲染函数createElement，当前行列的值，当前所在行的整行值，以VNode节点的形式输出
-       * textContent, htmlContent, nodeExpress三者只能选一个，若同时存在，使用优先顺序textContent > htmlContent > nodeExpress
-       * 若三者都不选用将直接显示值
-       **/
+     * 选项说明：
+     * prop:   字符串，必须，表示要输出的值的键
+     * label:  字符串，必须，表示该列显示在表头的值
+     * className: 为该列自定义的class
+     * width: 定义该列的显示宽度
+     * textContent: 文本内容生成回调函数，参数是当前行列的值，当前列定义，当前所在行的整行值，以文本插值的形式输出
+     * htmlContent: html内容生成回调函数，参数是当前行列的值，当前列定义，当前所在行的整行值，以HTML的形式输出
+     * nodeExpress: VNode生成回调函数，参数是渲染函数createElement，当前行列的值，当前所在行的整行值，以VNode节点的形式输出
+     * textContent, htmlContent, nodeExpress三者只能选一个，若同时存在，使用优先顺序textContent > htmlContent > nodeExpress
+     * 若三者都不选用将直接显示值
+     **/
     columnsDefinition: {
       type: Array,
       required: true,
@@ -224,10 +286,10 @@ export default {
       }
     },
     /**
-       * 指定翻页配置，选项说明，返回的对象应该包含
-       * pageSizes: 每页显示个数选择器的选项设置
-       * pageSize: 每页显示条目个数
-       */
+     * 指定翻页配置，选项说明，返回的对象应该包含
+     * pageSizes: 每页显示个数选择器的选项设置
+     * pageSize: 每页显示条目个数
+     */
     propPagination: {
       type: Object,
       default() {
@@ -238,8 +300,8 @@ export default {
       }
     },
     /**
-       * 从数据源中取得tabledata部分的数据
-       */
+     * 从数据源中取得tabledata部分的数据
+     */
     getTableDataFromResponse: {
       type: Function,
       default: (res) => {
@@ -247,8 +309,8 @@ export default {
       }
     },
     /**
-       * 从数据源中取得总页数
-       */
+     * 从数据源中取得总页数
+     */
     getTotalPageFromResponse: {
       type: Function,
       default: (res) => {
@@ -256,30 +318,69 @@ export default {
       }
     },
     /**
-       * 数据源url
-       */
+     * 数据源url
+     */
     dataSrcUrl: {
       type: String,
       required: true
     },
     /**
-       * 构建网络请求器
-       */
+     * 构建网络请求器
+     */
     axiosRequester: {
       validator: function(val) {
-        return val.constructor === RestfulReq
+        return val.constructor === Function
       },
-      default () {
-        return new RestfulReq()
+      default() {
+        return Axios.create({
+          url: this.dataSrcUrl
+        })
+      }
+    },
+    /**
+     * 新建请求处理, 必须是个函数，且返回promise对象
+     */
+    newOneDeal: {
+      type: Function,
+      default(data) {
+        return new Promise(resolve => {
+          resolve(data)
+        })
+      }
+    },
+
+    /**
+     * 编辑处理, 必须是个函数，且返回promise对象
+     */
+    editDeal: {
+      type: Function,
+      default(data) {
+        return new Promise(resolve => {
+          resolve(data)
+        })
+      }
+    },
+    /**
+     * 构造翻页所需参数
+     */
+    constructPageParams: {
+      type: Function,
+      default(page) {
+        return {
+          skip: (page.currentPage - 1) * page.pageSize,
+          take: page.pageSize
+        }
       }
     }
   },
   data() {
     return {
+      // 内部暂存表单数据
       innerFormDataTemp: {
         edit: {},
         newOne: {}
       },
+      // 标识对话框状态
       dialogStatus: {
         newOne: false,
         edit: false
@@ -294,7 +395,7 @@ export default {
           checkAllIndeterminate: false,
           checkAll: true
         },
-        //
+        // 列显示标识
         tableColShowFlag: {},
         table: {
           // 初始loading为true
@@ -311,7 +412,7 @@ export default {
         }
       },
       // sourceData，表格的数据
-      sourceData: testData.sourceData
+      sourceData: []
     }
   },
   computed: {
@@ -321,8 +422,16 @@ export default {
         return item.visible !== false
       }, this.columnsDefinition)
     },
-    tableData: function () {
-      return this.getTableDataFromResponse(this.sourceData)
+    tableData: {
+      get () {
+        return this.getTableDataFromResponse(this.sourceData)
+      },
+      set (val) {
+        let tmp = this.getTableDataFromResponse(this.sourceData)
+        tmp = []
+        tmp = tmp.concat(val)
+        return tmp
+      }
     },
     paginationTotalPage: function () {
       return this.getTotalPageFromResponse(this.sourceData)
@@ -330,7 +439,9 @@ export default {
     formRule: function () {
       const ret = {}
       this.columnsDefinition.forEach(item => {
-        ret[item.prop] = item.validRule
+        if(item.validRule) {
+          ret[item.prop] = item.validRule
+        }
       })
       return ret
     },
@@ -340,9 +451,9 @@ export default {
       })
     },
     labelWidthAuto: function () {
-      let width = 36
+      let width = 36 + 12
       this.columnsDefinition.forEach(item => {
-        const tmp = item.label.length * 18
+        const tmp = item.label.length * 18 + 12
         if(tmp > width) {
           width = tmp
         }
@@ -359,10 +470,11 @@ export default {
     },
     dataSrcUrl: {
       handler(val) {
-        this.axiosRequester.setReqUrl(val)
-        this.formDataRequest()
-      },
-      immediate: true
+        if(this.axiosRequester.default) {
+          this.axiosRequester.default.url = val
+          this.formDataRequest()
+        }
+      }
     }
   },
   beforeMount() {
@@ -372,10 +484,95 @@ export default {
     })
   },
   mounted() {
-    this.innerComponentStatus.pagination = Object.assign(this.innerComponentStatus.pagination, this.propPagination)
+    console.log('mounted', this.dataSrcUrl)
+    this.innerComponentStatus.pagination = {
+      ...this.innerComponentStatus.pagination,
+      ...this.propPagination
+    }
+    // 首次请求数据
+    this.formDataRequest()
   },
   methods: {
+    // 删除请求
+    deleteItems() {
+      this.deleteDeal(this.innerComponentStatus.table.selected).then(res => {
+        this.axiosRequester.request({
+          method: 'delete',
+          params: {
+            id: res.map(item => {
+              item.id
+            })
+          }
+        }).then(res => {
+          if(res.data.success) {
+            // TODO 成功后数据操作，后续需要完善
+            this.formDataRequest()
+          }
+        })
+      })
+    },
+    // 新建请求
     newOneFormConfirmHandle() {
+      this.newOneDeal(this.innerFormDataTemp.newOne).then((res) => {
+        this.axiosRequester.request({
+          method: 'post',
+          data: res
+        }).then(res => {
+          if(res.data.success) {
+            // TODO 删除成功后数据操作，后续需要完善
+            this.formDataRequest()
+          }
+        })
+      }).catch(err => {
+        this.$message({
+          type: 'warning',
+          message: err
+        })
+      })
+    },
+    // 编辑请求
+    editOneFormConfirmHandle() {
+      this.editDeal(this.innerFormDataTemp.edit).then((res) => {
+        this.axiosRequester.request({
+          method: 'put',
+          data: res
+        }).then(ret => {
+          if(ret.data.success) {
+            // TODO 成功后数据操作，后续需要完善
+            const idx = this.tableData.findIndex((item => {
+              return item.id === res.id
+            }))
+            const tmp = this.tableData;
+            this.$set(tmp, idx, res)
+            this.tableData = tmp
+          }
+        })
+        this.dialogStatus.edit = false
+      }).catch(err => {
+        this.$message({
+          type: 'warning',
+          message: err
+        })
+      })
+    },
+    // 呼出编辑一条
+    callEditDialog() {
+      if(this.innerComponentStatus.table.selected.length > 1) {
+        this.$message({
+          type: 'warning',
+          message: '编辑操作仅允许选择一项，您选择了多项'
+        })
+      } else if(this.innerComponentStatus.table.selected.length === 0) {
+        this.$message({
+          type: 'warning',
+          message: '编辑操作仅允许选择一项，请选择一项'
+        })
+      } else {
+        this.innerFormDataTemp.edit = {
+          ...this.innerComponentStatus.table.selected[0]
+        }
+        this.dialogStatus.edit = true
+      }
     },
     // 列筛选栏全选checkbox勾选或取消的处理
     // eslint-disable-next-line no-unused-vars
@@ -402,7 +599,7 @@ export default {
     },
     // 表格多选勾选事件处理
     tableSelectChangeHandle(val) {
-      this.table.selected = val
+      this.innerComponentStatus.table.selected = val
     },
     // 翻页大小改变的处理
     pageSizeChangeHandle(val) {
@@ -420,9 +617,10 @@ export default {
     formDataRequest() {
       this.innerComponentStatus.table.loading = true
       const pagination = this.innerComponentStatus.pagination
-      this.axiosRequester.reqGet({
-        skip: (pagination.currentPage - 1) * pagination.pageSize,
-        take: pagination.pageSize
+      this.axiosRequester.request({
+        params: {
+          ...this.constructPageParams(pagination)
+        }
       }).then(res => {
         this.sourceData = res
         this.innerComponentStatus.table.loading = false
@@ -436,6 +634,26 @@ export default {
   .manage-table-box @{deep} {
     .col-hide {
       display: none;
+    }
+  }
+  .manage-table-box{
+    position: relative;
+  }
+  .operate-area{
+    position: absolute;
+    z-index: 2;
+    left: 0;
+    top: 20%;
+    height: 120px;
+    width: 42px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    @{deep} {
+      .el-button{
+        margin: 0;
+      }
     }
   }
 </style>
