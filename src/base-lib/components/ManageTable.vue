@@ -61,12 +61,14 @@
             type="success"
             icon="el-icon-refresh"
             size="small"
+            @click="formDataRequest"
           />
           <el-button
             circle
             type="danger"
             icon="el-icon-delete"
             size="small"
+            @click="deleteItems"
           />
         </div>
       </el-col>
@@ -130,15 +132,16 @@
       />
     </el-row>
     <el-dialog
+      :width="newOneDialogWidth"
       title="新建"
       :visible.sync="dialogStatus.newOne"
     >
-      <el-form
-        :model="innerFormDataTemp.newOne"
-        :rules="formRule"
-        :label-width="labelWidthAuto"
-      >
-        <slot name="newOneForm">
+      <slot name="newOneForm">
+        <el-form
+          :model="innerFormDataTemp.newOne"
+          :rules="formRule"
+          :label-width="labelWidthAuto"
+        >
           <el-form-item
             v-for="(field, index) in editableField"
             :key="index"
@@ -146,8 +149,8 @@
           >
             <el-input v-model="innerFormDataTemp.newOne[field.prop]" />
           </el-form-item>
-        </slot>
-      </el-form>
+        </el-form>
+      </slot>
       <template v-slot:footer>
         <div>
           <el-button @click="dialogStatus.newOne = false">
@@ -163,15 +166,19 @@
       </template>
     </el-dialog>
     <el-dialog
+      :width="editDialogWidth"
       title="编辑"
       :visible.sync="dialogStatus.edit"
     >
-      <el-form
-        :model="innerFormDataTemp.edit"
-        :rules="formRule"
-        :label-width="labelWidthAuto"
+      <slot
+        name="editForm"
+        :formData="innerFormDataTemp.edit"
       >
-        <slot name="editForm">
+        <el-form
+          :model="innerFormDataTemp.edit"
+          :rules="formRule"
+          :label-width="labelWidthAuto"
+        >
           <el-form-item
             v-for="(field, index) in editableField"
             :key="index"
@@ -179,8 +186,8 @@
           >
             <el-input v-model="innerFormDataTemp.edit[field.prop]" />
           </el-form-item>
-        </slot>
-      </el-form>
+        </el-form>
+      </slot>
       <template v-slot:footer>
         <div>
           <el-button @click="dialogStatus.edit = false">
@@ -230,6 +237,20 @@ export default {
     }
   },
   props: {
+    // 编辑对话款的宽度
+    editDialogWidth: {
+      type: String,
+      default() {
+        return '800px'
+      }
+    },
+    // 新建对话款的宽度
+    newOneDialogWidth: {
+      type: String,
+      default() {
+        return '800px'
+      }
+    },
     // 是否显示顶部列显示筛选栏
     enableColShowSetting: {
       type: Boolean,
@@ -361,6 +382,23 @@ export default {
       }
     },
     /**
+     * 删除处理, 必须是个函数，且返回promise对象
+     */
+    deleteDeal: {
+      type: Function,
+      default(ids) {
+        return new Promise(resolve => {
+          resolve({
+            params: {
+              id: ids.map(item => {
+                return item.id
+              })
+            }
+          })
+        })
+      }
+    },
+    /**
      * 构造翻页所需参数
      */
     constructPageParams: {
@@ -484,7 +522,6 @@ export default {
     })
   },
   mounted() {
-    console.log('mounted', this.dataSrcUrl)
     this.innerComponentStatus.pagination = {
       ...this.innerComponentStatus.pagination,
       ...this.propPagination
@@ -496,17 +533,14 @@ export default {
     // 删除请求
     deleteItems() {
       this.deleteDeal(this.innerComponentStatus.table.selected).then(res => {
+        console.log(res)
         this.axiosRequester.request({
           method: 'delete',
-          params: {
-            id: res.map(item => {
-              item.id
-            })
-          }
-        }).then(res => {
-          if(res.data.success) {
+          ...res
+        }).then(resolve => {
+          if(resolve.data.success) {
             // TODO 成功后数据操作，后续需要完善
-            this.formDataRequest()
+
           }
         })
       })
@@ -519,7 +553,7 @@ export default {
           data: res
         }).then(res => {
           if(res.data.success) {
-            // TODO 删除成功后数据操作，后续需要完善
+            // TODO 成功后数据操作，后续需要完善
             this.formDataRequest()
           }
         })
