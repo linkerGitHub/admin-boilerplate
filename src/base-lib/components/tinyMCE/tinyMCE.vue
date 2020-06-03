@@ -1,7 +1,9 @@
 <template>
-  <div>
+  <div style="position:relative;">
     <editor
+      ref="tinyMceEditor"
       v-model="fullText"
+      style="position:relative;"
       :init="editorInit"
     />
   </div>
@@ -31,6 +33,8 @@ export default {
   data() {
     return {
       editorInit: {
+        // 语言
+        language: 'zh_CN',
         height: 500,
         menubar: true, // 上方menu菜单
         // toolbar: true, // false禁用工具栏（隐藏工具栏）
@@ -57,6 +61,13 @@ export default {
     }
   },
   watch: {
+    $refs: function (val, oldVal) {
+      if(val.tinyMceEditor && oldVal.tinyMceEditor === undefined) {
+        const sc = document.createElement('script')
+        sc.textContent = require('./langs/zh_CN.js')
+        document.head.appendChild(sc)
+      }
+    },
     value: function (val) {
       this.fullText = val
     },
@@ -67,6 +78,11 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style>
+.tox.tox-silver-sink.tox-tinymce-aux{
+  z-index: 999999!important;
+}
+.tox-notification {
+  display: none !important;
+}
 </style>

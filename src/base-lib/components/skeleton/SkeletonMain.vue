@@ -1,12 +1,25 @@
 <template>
   <el-container>
     <el-aside width="200px">
-      <el-menu :router="true">
-        <side-menu
+      <el-menu
+        :router="true"
+        :default-active="activeTab"
+      >
+        <div
           v-for="menu in menuRoutes"
-          :key="menu.name"
-          :menus="menu"
-        />
+          :key="menu.path"
+        >
+          <side-menu
+            v-if="menu.children && menu.children.length > 0"
+            :menus="menu"
+          />
+          <el-menu-item
+            v-else
+            :index="menu.path"
+          >
+            {{ menu.title }}
+          </el-menu-item>
+        </div>
       </el-menu>
     </el-aside>
     <el-container>
@@ -24,9 +37,9 @@
             :key="item.name"
             :label="item.title"
             :name="item.name"
-          >
-          </el-tab-pane>
+          />
         </el-tabs>
+
         <div style="position: relative">
           <keep-alive>
             <router-view />
@@ -94,7 +107,9 @@ export default {
       })
     },
     tabClickHandle(tab) {
-      this.jumpToTab(tab)
+      if(tab.name !== this.$route.path) {
+        this.jumpToTab(tab)
+      }
     }
   }
 }
