@@ -326,7 +326,7 @@ export default {
     getTableDataFromResponse: {
       type: Function,
       default: (res) => {
-        return res.data.data ? res.data.data.rows : []
+        return res.data && res.data.data ? res.data.data.rows : []
       }
     },
     /**
@@ -335,7 +335,7 @@ export default {
     getTotalPageFromResponse: {
       type: Function,
       default: (res) => {
-        return res.data.data ? res.data.data.num.all : 0
+        return res.data && res.data.data ? res.data.data.num.all : 0
       }
     },
     /**

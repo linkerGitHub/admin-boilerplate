@@ -1,7 +1,7 @@
 <template>
   <el-container>
     <el-aside width="200px">
-      <el-menu>
+      <el-menu :router="true">
         <side-menu
           v-for="menu in menuRoutes"
           :key="menu.name"
@@ -25,13 +25,13 @@
             :label="item.title"
             :name="item.name"
           >
-            <div style="position: relative">
-              <keep-alive>
-                <router-view />
-              </keep-alive>
-            </div>
           </el-tab-pane>
         </el-tabs>
+        <div style="position: relative">
+          <keep-alive>
+            <router-view />
+          </keep-alive>
+        </div>
       </el-main>
       <el-footer>Footer</el-footer>
     </el-container>
