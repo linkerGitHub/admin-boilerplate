@@ -1,3 +1,3 @@
 const IdxConfig = {
-  serverUrl: 'http://localhost'
+  serverUrl: 'http://localhost:8080'
 }
