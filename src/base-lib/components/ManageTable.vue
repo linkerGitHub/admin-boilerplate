@@ -133,10 +133,13 @@
     </el-row>
     <el-dialog
       :width="newOneDialogWidth"
-      title="新建"
+      :title="dialogTitle.newOne"
       :visible.sync="dialogStatus.newOne"
     >
-      <slot name="newOneForm">
+      <slot
+        name="newOneForm"
+        :formData="innerFormDataTemp.newOne"
+      >
         <el-form
           :model="innerFormDataTemp.newOne"
           :rules="formRule"
@@ -158,7 +161,7 @@
           </el-button>
           <el-button
             type="primary"
-            @click="newOneFormConfirmHandle"
+            @click="newOneClickHandle(innerFormDataTemp.newOne)"
           >
             确 定
           </el-button>
@@ -167,7 +170,7 @@
     </el-dialog>
     <el-dialog
       :width="editDialogWidth"
-      title="编辑"
+      :title="dialogTitle.edit"
       :visible.sync="dialogStatus.edit"
     >
       <slot
@@ -184,7 +187,10 @@
             :key="index"
             :label="field.label"
           >
-            <el-input v-model="innerFormDataTemp.edit[field.prop]" />
+            <el-input
+              v-model="innerFormDataTemp.edit[field.prop]"
+              :type="innerFormDataTemp.edit[field.prop] && innerFormDataTemp.edit[field.prop].length < 80 ? 'text':'textarea'"
+            />
           </el-form-item>
         </el-form>
       </slot>
@@ -195,7 +201,7 @@
           </el-button>
           <el-button
             type="primary"
-            @click="editOneFormConfirmHandle"
+            @click="editClickHandle(innerFormDataTemp.edit)"
           >
             确 定
           </el-button>
@@ -237,6 +243,36 @@ export default {
     }
   },
   props: {
+    /**
+     * 构造新建表单绑定的数据对象
+     **/
+    dataShaper: {
+      type: Function,
+      default() {
+        return {}
+      }
+    },
+
+    /**
+     * 编辑对话框确认按键被点击的回调
+     * 默认参数为编辑的数据
+     **/
+    editClickHandle: {
+      type: Function,
+      default() {
+        this.editOneFormConfirmHandle()
+      }
+    },
+    /**
+     * 新建对话框确认按键被点击的回调
+     * 默认参数为编辑的数据
+     **/
+    newOneClickHandle: {
+      type: Function,
+      default() {
+        this.newOneFormConfirmHandle()
+      }
+    },
     // 编辑对话款的宽度
     editDialogWidth: {
       type: String,
@@ -413,10 +449,14 @@ export default {
   },
   data() {
     return {
+      dialogTitle: {
+        newOne: '新建',
+        edit: '编辑'
+      },
       // 内部暂存表单数据
       innerFormDataTemp: {
-        edit: {},
-        newOne: {}
+        edit: this.dataShaper(),
+        newOne: this.dataShaper()
       },
       // 标识对话框状态
       dialogStatus: {
@@ -548,15 +588,8 @@ export default {
     // 新建请求
     newOneFormConfirmHandle() {
       this.newOneDeal(this.innerFormDataTemp.newOne).then((res) => {
-        this.axiosRequester.request({
-          method: 'post',
-          data: res
-        }).then(res => {
-          if(res.data.success) {
-            // TODO 成功后数据操作，后续需要完善
-            this.formDataRequest()
-          }
-        })
+        this.newOneSaveReq(res)
+        this.dialogStatus.newOne = false
       }).catch(err => {
         this.$message({
           type: 'warning',
@@ -564,23 +597,39 @@ export default {
         })
       })
     },
+    // 保存新增网络请求
+    newOneSaveReq(res) {
+      this.axiosRequester.request({
+        method: 'post',
+        data: res
+      }).then(res => {
+        if(res.data.success) {
+          // TODO 成功后数据操作，后续需要完善
+          this.formDataRequest()
+        }
+      })
+    },
+    // 保存编辑网络请求
+    editSaveReq(res) {
+      this.axiosRequester.request({
+        method: 'put',
+        data: res
+      }).then(ret => {
+        if(ret.data.success) {
+          // TODO 成功后数据操作，后续需要完善
+          const idx = this.tableData.findIndex((item => {
+            return item.id === res.id
+          }))
+          const tmp = this.tableData;
+          this.$set(tmp, idx, res)
+          this.tableData = tmp
+        }
+      })
+    },
     // 编辑请求
     editOneFormConfirmHandle() {
       this.editDeal(this.innerFormDataTemp.edit).then((res) => {
-        this.axiosRequester.request({
-          method: 'put',
-          data: res
-        }).then(ret => {
-          if(ret.data.success) {
-            // TODO 成功后数据操作，后续需要完善
-            const idx = this.tableData.findIndex((item => {
-              return item.id === res.id
-            }))
-            const tmp = this.tableData;
-            this.$set(tmp, idx, res)
-            this.tableData = tmp
-          }
-        })
+        this.editSaveReq(res)
         this.dialogStatus.edit = false
       }).catch(err => {
         this.$message({
@@ -605,6 +654,12 @@ export default {
         this.innerFormDataTemp.edit = {
           ...this.innerComponentStatus.table.selected[0]
         }
+        this.columnsDefinition.forEach(item => {
+          // 转化编辑时所见的值
+          if(item.convertValueForEdit) {
+            this.innerFormDataTemp.edit[item.prop] = item.convertValueForEdit(this.innerFormDataTemp.edit[item.prop], this.innerFormDataTemp.edit)
+          }
+        })
         this.dialogStatus.edit = true
       }
     },
