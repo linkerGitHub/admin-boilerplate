@@ -1,5 +1,38 @@
 <template>
   <div class="manage-table-box">
+    <div class="operate-area">
+      <el-button
+        v-if="operateButtons.includes('add')"
+        circle
+        icon="el-icon-plus"
+        size="small"
+        @click="dialogStatus.newOne = true"
+      />
+      <el-button
+        v-if="operateButtons.includes('edit')"
+        circle
+        type="primary"
+        icon="el-icon-edit"
+        size="small"
+        @click="callEditDialog"
+      />
+      <el-button
+        v-if="operateButtons.includes('refresh')"
+        circle
+        type="success"
+        icon="el-icon-refresh"
+        size="small"
+        @click="formDataRequest"
+      />
+      <el-button
+        v-if="operateButtons.includes('delete')"
+        circle
+        type="danger"
+        icon="el-icon-delete"
+        size="small"
+        @click="deleteItems"
+      />
+    </div>
     <el-row style="padding: 10px 0 20px 0">
       <el-col
         v-if="enableColShowSetting"
@@ -41,38 +74,7 @@
           </el-button>
         </el-popover>
       </el-col>
-      <el-col :span="5">
-        <div>
-          <el-button
-            circle
-            icon="el-icon-plus"
-            size="small"
-            @click="dialogStatus.newOne = true"
-          />
-          <el-button
-            circle
-            type="primary"
-            icon="el-icon-edit"
-            size="small"
-            @click="callEditDialog"
-          />
-          <el-button
-            circle
-            type="success"
-            icon="el-icon-refresh"
-            size="small"
-            @click="formDataRequest"
-          />
-          <el-button
-            circle
-            type="danger"
-            icon="el-icon-delete"
-            size="small"
-            @click="deleteItems"
-          />
-        </div>
-      </el-col>
-      <el-col :span="16">
+      <el-col :span="20">
         <slot name="searchBar" />
       </el-col>
     </el-row>
@@ -132,6 +134,7 @@
       />
     </el-row>
     <el-dialog
+      key="newOne"
       :width="newOneDialogWidth"
       :title="dialogTitle.newOne"
       :visible.sync="dialogStatus.newOne"
@@ -169,6 +172,7 @@
       </template>
     </el-dialog>
     <el-dialog
+      key="edit"
       :width="editDialogWidth"
       :title="dialogTitle.edit"
       :visible.sync="dialogStatus.edit"
@@ -243,6 +247,16 @@ export default {
     }
   },
   props: {
+    /**
+     * 操作组件
+     **/
+    operateButtons: {
+      type: Array,
+      default() {
+        return ['add', 'edit', 'refresh', 'delete']
+      }
+    },
+
     /**
      * 构造新建表单绑定的数据对象
      **/
@@ -547,9 +561,9 @@ export default {
       })
     },
     dataSrcUrl: {
-      handler(val) {
-        if(this.axiosRequester.default) {
-          this.axiosRequester.default.url = val
+      handler(val, oldVal) {
+        if(val !== oldVal) {
+          this.axiosRequester.defaults.url = val
           this.formDataRequest()
         }
       }
@@ -572,18 +586,31 @@ export default {
   methods: {
     // 删除请求
     deleteItems() {
-      this.deleteDeal(this.innerComponentStatus.table.selected).then(res => {
-        console.log(res)
-        this.axiosRequester.request({
-          method: 'delete',
-          ...res
-        }).then(resolve => {
-          if(resolve.data.success) {
-            // TODO 成功后数据操作，后续需要完善
-
-          }
+      if(this.innerComponentStatus.table.selected.length === 0) {
+        this.$message({
+          type: 'warning',
+          message: '请至少选择一条进行删除操作。'
         })
-      })
+      } else {
+        this.$confirm('此操作将删除这些条目, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.deleteDeal(this.innerComponentStatus.table.selected).then(res => {
+            console.log(res)
+            this.axiosRequester.request({
+              method: 'delete',
+              ...res
+            }).then(resolve => {
+              if(resolve.data.success) {
+                // TODO 成功后数据操作，后续需要完善
+
+              }
+            })
+          })
+        })
+      }
     },
     // 新建请求
     newOneFormConfirmHandle() {
@@ -729,11 +756,11 @@ export default {
     position: relative;
   }
   .operate-area{
-    position: absolute;
+    position: fixed;
     z-index: 2;
-    left: 0;
-    top: 20%;
-    height: 120px;
+    left: 186px;
+    top: 20vh;
+    height: 150px;
     width: 42px;
     display: flex;
     flex-direction: column;
