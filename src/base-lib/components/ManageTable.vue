@@ -576,10 +576,14 @@ export default {
     })
   },
   mounted() {
+    // 翻页
     this.innerComponentStatus.pagination = {
       ...this.innerComponentStatus.pagination,
       ...this.propPagination
     }
+    // 网络请求器配置
+    this.axiosRequester.defaults.url = this.dataSrcUrl
+
     // 首次请求数据
     this.formDataRequest()
   },
@@ -648,7 +652,7 @@ export default {
             return item.id === res.id
           }))
           const tmp = this.tableData;
-          this.$set(tmp, idx, res)
+          this.$set(tmp, idx, this.innerFormDataTemp.edit)
           this.tableData = tmp
         }
       })
@@ -764,7 +768,7 @@ export default {
     width: 42px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     @{deep} {
       .el-button{
