@@ -22,7 +22,6 @@
       :auto-upload="false"
       :on-success="onSuccess"
       :on-change="uploaderFileChangeHandle"
-      :limit="limit"
     >
       <img
         v-if="files.length > 0"
