@@ -58,5 +58,6 @@ export {
 export default {
   install(vue) {
     Object.defineProperties(vue.prototype, {'$http': { value: Axios}})
+    Object.defineProperties(vue.prototype, {'$genHttpInstance': { value: createAxios}})
   }
 }
