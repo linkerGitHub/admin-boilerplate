@@ -82,15 +82,18 @@ export default {
     }
   },
   watch: {
-    fileList: function (val, oldVal) {
-      const ret = val.filter(item => {
-        return oldVal.findIndex(it => {
-          return it.url === item.url
-        }) === -1
-      })
-      if(ret.length > 0) {
-        this.files = val
-      }
+    fileList: {
+      handler: function (val, oldVal) {
+        const ret = val.filter(item => {
+          return oldVal.findIndex(it => {
+            return it.url === item.url
+          }) === -1
+        })
+        if(ret.length > 0) {
+          this.files = val
+        }
+      },
+      deep: true
     }
   },
   mounted() {
