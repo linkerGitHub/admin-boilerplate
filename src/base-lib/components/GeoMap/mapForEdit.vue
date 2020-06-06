@@ -47,7 +47,7 @@
         适应轮廓
       </el-button>
       <el-button @click="setEventToAllPolygonPath()">
-        设置事件监听器
+        设置绘制图层被点击事件监听
       </el-button>
       <div>
         {{ drawLayerVertexData }}
@@ -79,6 +79,18 @@ export default {
       type: Array,
       default() {
         return []
+      }
+    },
+    initialCenter: {
+      type: Array,
+      default() {
+        return [103.61036691794625, 32.700350524387304]
+      }
+    },
+    additionMapInitJob: {
+      type: Function,
+      default(map) {
+        return map
       }
     }
   },
@@ -154,7 +166,7 @@ export default {
       const mapElem = this.$el.getElementsByClassName('map')[0]
       const map = L.map(mapElem, {
         attributionControl: false,
-        center: [103.61036691794625, 32.700350524387304].reverse(),
+        center: this.initialCenter.reverse(),
         zoom: 17,
         layers: [routeMap],
         zoomControl: false
@@ -182,6 +194,8 @@ export default {
         this.setDataToDraw(this.initialBoundary)
         this.fitBoundary()
       }
+
+      this.additionMapInitJob(map)
     },
     // 切换瓦片图层
     toggleMapTileLayer() {
@@ -244,11 +258,12 @@ export default {
       this.setVertexBorderColor()
       this.$emit('draw-finish', this.drawLayerVertexData)
     },
-    // 设置监听事件
+    // 为绘制的图层设置监听事件
     setEventToAllPolygonPath(event = 'click') {
       for (const argumentsKey in this.workingLayers) {
         const item = this.workingLayers[argumentsKey]
         item._path.addEventListener(event, () => {
+          console.log(event)
           item.setStyle({
             fillOpacity: 0.6
           })

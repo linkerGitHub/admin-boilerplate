@@ -22,7 +22,7 @@ function setInterceptor(axiosInstance) {
   axiosInstance.interceptors.response.use(
     res => {
       // TODO 配置数据响应处理
-      if(res.data.code !== 200) {
+      if(res.data.statusCode !== 200) {
         Message({
           type: 'error',
           message: res.data.msg
