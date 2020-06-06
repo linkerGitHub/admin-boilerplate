@@ -216,11 +216,11 @@
 </template>
 
 <script>
-import tableDataProcessor from '../utils/table-data-processor'
+import tableDataProcessor from '../../utils/table-data-processor'
 import Axios from 'axios'
 
 export default {
-  name: 'ManageTable',
+  name: 'Index',
   components: {
     // 渲染函数
     VNodeRender: {

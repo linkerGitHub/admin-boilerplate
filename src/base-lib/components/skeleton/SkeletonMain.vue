@@ -46,7 +46,7 @@
           </keep-alive>
         </div>
       </el-main>
-      <el-footer></el-footer>
+      <el-footer />
     </el-container>
   </el-container>
 </template>
