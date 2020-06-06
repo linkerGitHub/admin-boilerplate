@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import ManageTable from '@/base-lib/components/ManageTable'
+import ManageTable from '@/base-lib/components/ManageTable/Index.vue'
 export default {
   name: 'Index',
   components: {ManageTable},

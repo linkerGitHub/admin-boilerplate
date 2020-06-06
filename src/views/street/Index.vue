@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import ManageTable from '@/base-lib/components/ManageTable'
+import ManageTable from '@/base-lib/components/ManageTable/Index.vue'
 export default {
   name: 'Index',
   components: {ManageTable},
@@ -20,7 +20,7 @@ export default {
           label: 'id'
         },
         {
-          prop: 'streetName',
+          prop: 'street_name',
           label: '街道名称',
           editable: true,
         },
