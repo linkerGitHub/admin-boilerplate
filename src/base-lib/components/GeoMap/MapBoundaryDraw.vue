@@ -1,15 +1,33 @@
 <template>
   <div style="position: relative; overflow: hidden">
-    <div :class="{'right-collapse-panel-active': drawProcedureStatus.drawDone}" class="right-collapse-panel">
+    <div
+      :class="{'right-collapse-panel-active': drawProcedureStatus.drawDone}"
+      class="right-collapse-panel"
+    >
       <div class="color-select-title">
         选择轮廓颜色
       </div>
-      <color-pan :value="initialBoundaryColor" @color-change="setBoundaryColor"/>
+      <color-pan
+        :value="initialBoundaryColor"
+        @color-change="setBoundaryColor"
+      />
       <div class="btn-layer-wrapper">
-        <el-button type="primary" size="medium" @click="saveExitHandle">保存并退出</el-button>
+        <el-button
+          type="primary"
+          size="medium"
+          @click="saveExitHandle"
+        >
+          保存并退出
+        </el-button>
       </div>
       <div class="btn-layer-wrapper">
-        <el-button plain size="medium" @click="restartDraw">重新绘制</el-button>
+        <el-button
+          plain
+          size="medium"
+          @click="restartDraw"
+        >
+          重新绘制
+        </el-button>
       </div>
     </div>
     <div class="search-box">
@@ -19,28 +37,54 @@
         size="medium"
         clearable
         @clear="onCancel"
-        @input="posSuggestListReq"/>
-      <div v-show="filteredSuggestion.length > 0" class="suggestion-box">
+        @input="posSuggestListReq"
+      />
+      <div
+        v-show="filteredSuggestion.length > 0"
+        class="suggestion-box"
+      >
         <ul>
-          <li v-for="(item, idx) in filteredSuggestion" :key="idx" @click="suggestionClickHandle(item)">
+          <li
+            v-for="(item, idx) in filteredSuggestion"
+            :key="idx"
+            @click="suggestionClickHandle(item)"
+          >
             <span>{{ item.name }}</span>
             <span class="district">{{ item.district }}</span>
           </li>
         </ul>
       </div>
     </div>
-    <el-button v-show="!drawProcedureStatus.drawStarted" class="start-draw-btn" size="medium" type="default" @click="startSetBoundary">开始绘制</el-button>
-    <el-radio-group v-model="mapLayerSwitch" class="map-toggle" size="medium" @change="$refs['map-big'].toggleMapTileLayer()">
-      <el-radio-button :label="false">卫星</el-radio-button>
-      <el-radio-button :label="true">地图</el-radio-button>
+    <el-button
+      v-show="!drawProcedureStatus.drawStarted"
+      class="start-draw-btn"
+      size="medium"
+      type="default"
+      @click="startSetBoundary"
+    >
+      开始绘制
+    </el-button>
+    <el-radio-group
+      v-model="mapLayerSwitch"
+      class="map-toggle"
+      size="medium"
+      @change="$refs['map-big'].toggleMapTileLayer()"
+    >
+      <el-radio-button :label="false">
+        卫星
+      </el-radio-button>
+      <el-radio-button :label="true">
+        地图
+      </el-radio-button>
     </el-radio-group>
     <el-button
       v-show="drawProcedureStatus.drawStarted && !drawProcedureStatus.drawDone"
       type="danger"
       size="medium"
       class="undo-btn"
-      @click="undoLastPoint">
-      <svg-icon icon-class="undo"/>撤销
+      @click="undoLastPoint"
+    >
+      <svg-icon icon-class="undo" />撤销
     </el-button>
     <el-button
       round
@@ -49,7 +93,15 @@
       icon="el-icon-location-information"
       @click="setCenterToGeoLocation"
     />
-    <map-for-edit ref="map-big" :debug="false" :draw-color="drawColor" :initial-boundary="initialBoundary" style="height: 80vh; width: 100%;" @draw-vertex-added="vertexAddedHandle" @draw-finish="drawFinishHandle"/>
+    <map-for-edit
+      ref="map-big"
+      :debug="false"
+      :draw-color="drawColor"
+      :initial-boundary="initialBoundary"
+      style="height: 80vh; width: 100%;"
+      @draw-vertex-added="vertexAddedHandle"
+      @draw-finish="drawFinishHandle"
+    />
   </div>
 </template>
 
@@ -223,7 +275,7 @@ export default {
         this.setProcedureStatus(4)
       }
     },
-    vertexAddedHandle(e) {
+    vertexAddedHandle() {
       const mapComponent = this.$refs['map-big']
       if (mapComponent.drawLayerVertexData.length >= 1) {
         this.setProcedureStatus(3)
@@ -252,7 +304,7 @@ export default {
         mapComponent.drawGiveUp()
       }
     },
-    drawFinishHandle(data) {
+    drawFinishHandle() {
       this.setProcedureStatus(4)
     },
     setBoundaryColor(color) {
@@ -266,26 +318,26 @@ export default {
     },
     setProcedureStatus(stage) {
       switch (stage) {
-        case 1:
-          this.drawProcedureStatus.drawStarted = false
-          this.drawProcedureStatus.drawing = false
-          this.drawProcedureStatus.drawDone = false
-          break
-        case 2:
-          this.drawProcedureStatus.drawStarted = true
-          this.drawProcedureStatus.drawing = false
-          this.drawProcedureStatus.drawDone = false
-          break
-        case 3:
-          this.drawProcedureStatus.drawStarted = true
-          this.drawProcedureStatus.drawing = true
-          this.drawProcedureStatus.drawDone = false
-          break
-        case 4:
-          this.drawProcedureStatus.drawStarted = true
-          this.drawProcedureStatus.drawing = true
-          this.drawProcedureStatus.drawDone = true
-          break
+      case 1:
+        this.drawProcedureStatus.drawStarted = false
+        this.drawProcedureStatus.drawing = false
+        this.drawProcedureStatus.drawDone = false
+        break
+      case 2:
+        this.drawProcedureStatus.drawStarted = true
+        this.drawProcedureStatus.drawing = false
+        this.drawProcedureStatus.drawDone = false
+        break
+      case 3:
+        this.drawProcedureStatus.drawStarted = true
+        this.drawProcedureStatus.drawing = true
+        this.drawProcedureStatus.drawDone = false
+        break
+      case 4:
+        this.drawProcedureStatus.drawStarted = true
+        this.drawProcedureStatus.drawing = true
+        this.drawProcedureStatus.drawDone = true
+        break
       }
     },
     saveExitHandle() {
