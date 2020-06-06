@@ -247,6 +247,12 @@ export default {
     }
   },
   props: {
+    assertRequestSuccess: {
+      type: Function,
+      default(res) {
+        return res.data.statusCode === 200
+      }
+    },
     /**
      * 操作组件
      **/
@@ -646,7 +652,7 @@ export default {
         method: 'put',
         data: res
       }).then(ret => {
-        if(ret.data.success) {
+        if(this.assertRequestSuccess(ret)) {
           // TODO 成功后数据操作，后续需要完善
           const idx = this.tableData.findIndex((item => {
             return item.id === res.id
@@ -659,7 +665,8 @@ export default {
     },
     // 编辑请求
     editOneFormConfirmHandle() {
-      this.editDeal(this.innerFormDataTemp.edit).then((res) => {
+      const detachedData = JSON.parse(JSON.stringify(this.innerFormDataTemp.edit))
+      this.editDeal(detachedData).then((res) => {
         this.editSaveReq(res)
         this.dialogStatus.edit = false
       }).catch(err => {
