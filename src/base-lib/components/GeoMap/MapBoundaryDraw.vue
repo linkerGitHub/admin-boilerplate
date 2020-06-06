@@ -351,7 +351,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .suggestion-box{
     background-color: #fff;
     position: absolute;
