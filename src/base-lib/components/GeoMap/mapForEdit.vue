@@ -184,7 +184,7 @@ export default {
       }
     },
     // 切换瓦片图层
-    toggleMapTileLayer(layerName = '') {
+    toggleMapTileLayer() {
       if (this.map.hasLayer(this.baseLayer['routeMap'])) {
         this.map.removeLayer(this.baseLayer['routeMap'])
         this.map.addLayer(this.baseLayer['normalMap'])
@@ -308,7 +308,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .map {
     height: 100%;
     width: 100%;

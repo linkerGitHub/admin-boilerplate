@@ -160,7 +160,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped lang="less">
   .color-pan{
     width: 207px;
     position: relative;
