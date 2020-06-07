@@ -26,11 +26,24 @@ export default {
       marker: null
     }
   },
+  computed: {
+    convertedValue() {
+      if(this.value.constructor === String) {
+        if(this.value.length === 0) {
+          return []
+        }
+        return JSON.parse(this.value)
+      } else {
+        return this.value
+      }
+    }
+  },
   watch: {
     value: function () {
       if(this.convertedValue.length > 0) {
         if(this.marker !== null) {
           this.setValueMarkerToMap()
+          this.setCenterByValueForMap()
         } else {
           this.initialSetMarker()
         }
@@ -82,18 +95,6 @@ export default {
         }
         this.$emit('change', [e.latlng.lat, e.latlng.lng])
       })
-    }
-  },
-  computed: {
-    convertedValue() {
-      if(this.value.constructor === String) {
-        if(this.value.length === 0) {
-          return []
-        }
-        return JSON.parse(this.value)
-      } else {
-        return this.value
-      }
     }
   }
 }

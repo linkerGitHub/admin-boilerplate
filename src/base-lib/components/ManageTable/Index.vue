@@ -689,15 +689,7 @@ export default {
           message: '编辑操作仅允许选择一项，请选择一项'
         })
       } else {
-        this.innerFormDataTemp.edit = {
-          ...this.innerComponentStatus.table.selected[0]
-        }
-        this.columnsDefinition.forEach(item => {
-          // 转化编辑时所见的值
-          if(item.convertValueForEdit) {
-            this.innerFormDataTemp.edit[item.prop] = item.convertValueForEdit(this.innerFormDataTemp.edit[item.prop], this.innerFormDataTemp.edit)
-          }
-        })
+        this.innerFormDataTemp.edit = JSON.parse(JSON.stringify(this.innerComponentStatus.table.selected[0]))
         this.dialogStatus.edit = true
       }
     },
