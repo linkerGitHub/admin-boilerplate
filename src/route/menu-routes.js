@@ -1,21 +1,18 @@
+import { routes } from './index'
+
+const indexRoute = routes[1]
+const fromRouter = indexRoute.children.map(item => {
+  return {
+    name: indexRoute.path + '/' + item.path,
+    title: item.meta.title
+  }
+})
+
 // path、component、name、title是必须的
 export default [
   {
     title: '首页',
     name: '/index',
-    children: [
-      {
-        title: '图片',
-        name: '/index/pic'
-      },
-      {
-        title: '街道',
-        name: '/index/street'
-      },
-      {
-        title: '地点',
-        name: '/index/place'
-      }
-    ]
+    children: fromRouter
   }
 ]

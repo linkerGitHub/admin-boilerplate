@@ -1,6 +1,6 @@
 import VueRouter from 'vue-router'
 
-const routes = [
+export const routes = [
   {
     path: '/',
     redirect: '/index'
@@ -10,14 +10,6 @@ const routes = [
     component: () => import('@/views/Index.vue'),
     redirect: '/index/pic',
     children: [
-      {
-        path: 'sys-config',
-        name: 'SysConfig',
-        component: () => import('@/views/sysConfig/Index'),
-        meta: {
-          title: '系统配置'
-        }
-      },
       {
         path: 'pic',
         component: () => import('@/views/pic/Index'),
@@ -38,6 +30,27 @@ const routes = [
         meta: {
           title: '地点'
         }
+      },
+      {
+        path: 'tag',
+        component: () => import('@/views/tag/Index'),
+        meta: {
+          title: '标签'
+        }
+      },
+      {
+        path: 'time-stage',
+        component: () => import('@/views/timeStage/Index'),
+        meta: {
+          title: '时间阶段'
+        }
+      },
+      {
+        path: 'user',
+        component: () => import('@/views/user/Index'),
+        meta: {
+          title: '用户'
+        }
       }
     ]
   },
@@ -56,3 +69,4 @@ router.beforeEach((to, from, next) => {
 })
 
 export default router
+

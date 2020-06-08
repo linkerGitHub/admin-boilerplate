@@ -22,14 +22,19 @@ function setInterceptor(axiosInstance) {
   axiosInstance.interceptors.response.use(
     res => {
       // TODO 配置数据响应处理
-      if(res.data.statusCode !== 200) {
+      const statusCode = res.data.statusCode
+      switch (statusCode) {
+      case 200:
+        break
+      case 401:
+        router.push({name: 'login'})
+        break
+      default:
         Message({
           type: 'error',
           message: res.data.msg
         })
-      }
-      if(res.data.code === 410) {
-        router.push({name: 'login'})
+        throw new Error(statusCode)
       }
       return res
     },
