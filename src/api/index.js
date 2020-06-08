@@ -17,3 +17,21 @@ export function getStreet(params) {
     params
   })
 }
+
+export function getPlace(params) {
+  return createAxios({
+    method: 'get',
+    url: '/place'
+  }).request({
+    params
+  })
+}
+
+export function getTimeStage(params) {
+  return createAxios({
+    method: 'get',
+    url: '/time-stage'
+  }).request({
+    params
+  })
+}

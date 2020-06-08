@@ -8,12 +8,13 @@
 
 export default {
   name: 'App',
-  components: {
+  beforeMount() {
+    this.$store.dispatch('reloadPlace')
+    this.$store.dispatch('reloadStreet')
+    this.$store.dispatch('reloadTimeStage')
   },
-  data() {
-    return {
-
-    }
+  mounted() {
+    console.log(this.$router)
   }
 }
 </script>
