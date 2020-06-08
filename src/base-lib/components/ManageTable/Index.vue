@@ -247,6 +247,24 @@ export default {
     }
   },
   props: {
+    /**
+     * 修改请求成功的回调
+     **/
+    saveSuccess: {
+      type: Function,
+      default() {}
+    },
+
+    /**
+     * 修改成功回调
+     **/
+    editSuccess: {
+      type: Function,
+      default() {}
+    },
+    /**
+     * 判定请求是否成功
+     **/
     assertRequestSuccess: {
       type: Function,
       default(res) {
@@ -639,10 +657,13 @@ export default {
       this.axiosRequester.request({
         method: 'post',
         data: res
-      }).then(res => {
-        if(res.data.success) {
+      }).then(ret => {
+        if(this.assertRequestSuccess(ret)) {
           // TODO 成功后数据操作，后续需要完善
           this.formDataRequest()
+
+          // 成功后回调
+          this.saveSuccess()
         }
       })
     },
@@ -660,6 +681,9 @@ export default {
           const tmp = this.tableData;
           this.$set(tmp, idx, this.innerFormDataTemp.edit)
           this.tableData = tmp
+
+          // 成功后回调
+          this.editSuccess()
         }
       })
     },

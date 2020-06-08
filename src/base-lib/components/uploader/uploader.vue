@@ -4,7 +4,8 @@
       v-if="limit !== 1"
       ref="uploader"
       :action="uploadUrl"
-      name="pic"
+      :headers="headers"
+      :name="name"
       :file-list="fileList"
       list-type="picture-card"
       :auto-upload="false"
@@ -17,7 +18,8 @@
     <el-upload
       ref="uploader"
       :action="uploadUrl"
-      name="pic"
+      :name="name"
+      :headers="headers"
       :show-file-list="false"
       :auto-upload="false"
       :on-success="onSuccess"
@@ -42,6 +44,18 @@
 export default {
   name: 'Uploader',
   props: {
+    headers: {
+      type: Object,
+      default() {
+        return {}
+      }
+    },
+    name: {
+      type: String,
+      default() {
+        return 'file'
+      }
+    },
     fileListOfUploader: {
       type: Array,
       default() {
