@@ -8,14 +8,17 @@
     placeholder="请输入关键词"
     :remote-method="remoteMethod"
     :loading="loading"
+    :value-key="valueKey"
     @change="$emit('change', selectedVal)"
   >
     <el-option
       v-for="item in options"
       :key="item[valueKey]"
       :label="item[labelKey]"
-      :value="item[valueKey]"
-    />
+      :value="objectValue ? item : item[valueKey]"
+    >
+      {{ item[labelKey] }} - {{ item[valueKey] }}
+    </el-option>
   </el-select>
 </template>
 
@@ -28,6 +31,18 @@ export default {
     event: 'change'
   },
   props: {
+    presetOptions: {
+      type: Array,
+      default() {
+        return []
+      }
+    },
+    objectValue: {
+      type: Boolean,
+      default()  {
+        return true
+      }
+    },
     valueKey: {
       type: String,
       default() {
@@ -71,8 +86,20 @@ export default {
     }
   },
   watch: {
-    value: function(val) {
-      this.selectedVal = val
+    value: {
+      handler(val) {
+        this.selectedVal = val
+        const tmp = []
+        val.forEach(item => {
+          if(this.options.findIndex(ite => {
+            return item[this.labelKey] === ite[this.labelKey]
+          }) === -1) {
+            tmp.push(item)
+          }
+        })
+        this.options.push(...tmp)
+      },
+      immediate: true
     }
   },
   methods: {
