@@ -6,7 +6,7 @@
         circle
         icon="el-icon-plus"
         size="small"
-        @click="dialogStatus.newOne = true"
+        @click="callNewOneDialog"
       />
       <el-button
         v-if="operateButtons.includes('edit')"
@@ -456,6 +456,28 @@ export default {
       }
     },
     /**
+     * 编辑处理, 必须是个函数，且返回promise对象
+     */
+    beforeEditDialogOpen: {
+      type: Function,
+      default(data) {
+        return new Promise(resolve => {
+          resolve(data)
+        })
+      }
+    },
+    /**
+     * 编辑处理, 必须是个函数，且返回promise对象
+     */
+    beforeNewOneDialogOpen: {
+      type: Function,
+      default(data) {
+        return new Promise(resolve => {
+          resolve(data)
+        })
+      }
+    },
+    /**
      * 删除处理, 必须是个函数，且返回promise对象
      */
     deleteDeal: {
@@ -463,7 +485,7 @@ export default {
       default(ids) {
         return new Promise(resolve => {
           resolve({
-            params: {
+            data: {
               id: ids.map(item => {
                 return item.id
               })
@@ -700,6 +722,13 @@ export default {
         })
       })
     },
+    // 呼出新建一条对话框
+    callNewOneDialog() {
+      this.beforeNewOneDialogOpen(this.innerFormDataTemp.newOne).then((res) => {
+        this.innerFormDataTemp.newOne = res || this.innerFormDataTemp.newOne
+        this.dialogStatus.newOne = true
+      })
+    },
     // 呼出编辑一条
     callEditDialog() {
       if(this.innerComponentStatus.table.selected.length > 1) {
@@ -713,8 +742,11 @@ export default {
           message: '编辑操作仅允许选择一项，请选择一项'
         })
       } else {
-        this.innerFormDataTemp.edit = JSON.parse(JSON.stringify(this.innerComponentStatus.table.selected[0]))
-        this.dialogStatus.edit = true
+        const tmp = JSON.parse(JSON.stringify(this.innerComponentStatus.table.selected[0]))
+        this.beforeEditDialogOpen(tmp).then((res) => {
+          this.innerFormDataTemp.edit = res || tmp
+          this.dialogStatus.edit = true
+        })
       }
     },
     // 列筛选栏全选checkbox勾选或取消的处理
