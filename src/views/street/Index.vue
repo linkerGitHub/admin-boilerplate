@@ -22,6 +22,23 @@
             <el-input v-model="formData.street_name" />
           </el-form-item>
           <el-form-item
+            label="关联时间阶段"
+            prop="time_stage"
+          >
+            <el-select
+              v-model="formData.time_stage"
+              value-key="id"
+              multiple
+            >
+              <el-option
+                v-for="op in $store.state.dataSrc.timeStage"
+                :key="op.id"
+                :label="op.stage_name"
+                :value="op"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item
             label="位置代码"
             prop="street_id"
           >
@@ -50,6 +67,23 @@
             <el-input v-model="formData.street_name" />
           </el-form-item>
           <el-form-item
+            label="关联时间阶段"
+            prop="time_stage"
+          >
+            <el-select
+              v-model="formData.time_stage"
+              value-key="id"
+              multiple
+            >
+              <el-option
+                v-for="op in $store.state.dataSrc.timeStage"
+                :key="op.id"
+                :label="op.stage_name"
+                :value="op"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item
             label="位置代码"
             prop="street_id"
           >
@@ -73,7 +107,6 @@
 <script>
 import ManageTable from '@/base-lib/components/ManageTable/Index.vue'
 import GetPositionFromMap from '@/base-lib/components/GeoMap/GetPositionFromMap'
-import {getStreet} from '@/api'
 export default {
   name: 'Index',
   components: {GetPositionFromMap, ManageTable},
@@ -90,18 +123,23 @@ export default {
           editable: true,
         },
         {
+          prop: 'time_stage',
+          label: '关联时间阶段',
+          textContent(val) {
+            return val.map(item => {
+              return item.stage_name
+            }).join(',')
+          }
+        },
+        {
           prop: 'street_id',
           label: '位置代码',
           editable: true
         }
-      ],
-      dataSrc: {
-        street: []
-      }
+      ]
     }
   },
   mounted() {
-    this.getStreetDataSrc()
   },
   methods: {
     dataShaper() {
@@ -116,17 +154,11 @@ export default {
       if(tmp.lat_lng.constructor === Array) {
         tmp.lat_lng = JSON.stringify(tmp.lat_lng)
       }
-
+      tmp.time_stage = tmp.time_stage.map(item => {
+        return item.id
+      })
       return new Promise(resolve => {
         resolve(tmp)
-      })
-    },
-    getStreetDataSrc() {
-      getStreet({
-        skip: 0,
-        take: 1000
-      }).then(res => {
-        this.dataSrc.street = res.data.data.rows
       })
     }
   }

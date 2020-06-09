@@ -35,3 +35,19 @@ export function getTimeStage(params) {
     params
   })
 }
+
+export function getPic(params) {
+  return createAxios({
+    method: 'get',
+    url: '/pic'
+  }).request({
+    params
+  })
+}
+
+export function getPicById(id) {
+  return createAxios({
+    method: 'get',
+    url: '/pic/'+id
+  }).request({})
+}
