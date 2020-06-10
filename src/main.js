@@ -8,6 +8,14 @@ import store from './store'
 import Axios from './base-lib/utils/axios/index'
 Vue.config.productionTip = false
 
+
+// 加载初始化
+const auth = localStorage.getItem('auth')
+if(auth !== null) {
+  store.commit('setAuth', auth)
+}
+
+
 Vue.use(ElementUI)
 Vue.use(VueRouter)
 Vue.use(Axios)

@@ -12,10 +12,15 @@ function setInterceptor(axiosInstance) {
   axiosInstance.interceptors.request.use(
     config => {
       // TODO 配置鉴权token
+      let auth = localStorage.getItem('auth')
+      if(auth !== null) {
+        auth = JSON.parse(auth)
+        config.headers.authorization = auth.token
+      }
       return config
     },
     // error => {
-    //     // TODO 配置错误处理
+    // TODO 配置错误处理
     // }
   )
 
@@ -26,21 +31,32 @@ function setInterceptor(axiosInstance) {
       switch (statusCode) {
       case 200:
         break
-      case 401:
-        router.push({name: 'login'})
-        break
       default:
         Message({
           type: 'error',
           message: res.data.msg
         })
-        throw new Error(statusCode)
       }
       return res
     },
     error => {
       // TODO 配置请求返回的错误处理
-      console.log(error)
+      const response = error.response
+      // TODO 配置数据响应处理
+      const statusCode = response.data.statusCode
+      switch (statusCode) {
+      case 401:
+        if(router.currentRoute.name !== 'login') {
+          router.push({name: 'login'})
+        }
+        // eslint-disable-next-line no-fallthrough
+      default:
+        Message({
+          type: 'error',
+          message: response.data.error.description
+        })
+      }
+      throw error
     }
   )
 }

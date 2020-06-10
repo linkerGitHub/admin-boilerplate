@@ -7,6 +7,7 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     userInfo: {},
+    auth: {},
     dataSrc: {
       street: [],
       place: [],
@@ -25,6 +26,9 @@ const store = new Vuex.Store({
     },
     setUserInfo(state, payload) {
       state.userInfo = payload
+    },
+    setAuth(state, payload) {
+      state.auth = payload
     }
   },
   actions: {
