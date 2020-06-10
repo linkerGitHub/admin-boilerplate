@@ -18,6 +18,13 @@ export const routes = [
         }
       },
       {
+        path: 'collection',
+        component: () => import('@/views/collection/Index'),
+        meta: {
+          title: '图集'
+        }
+      },
+      {
         path: 'street',
         component: () => import('@/views/street/Index'),
         meta: {
