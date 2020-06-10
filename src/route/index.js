@@ -3,7 +3,8 @@ import VueRouter from 'vue-router'
 export const routes = [
   {
     path: '/',
-    redirect: '/index'
+    redirect: '/index',
+    name: 'index'
   },
   {
     path: '/index',
@@ -63,7 +64,13 @@ export const routes = [
   },
   {
     path: '/login',
-    component: () => import('@/views/login/Index')
+    name: 'login',
+    component: () => import('@/views/login/Index'),
+    beforeEnter: (to, from, next) => {
+      if(localStorage.getItem('auth') !== null) {
+        next({ name: 'index' })
+      }
+    }
   }
 ]
 

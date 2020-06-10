@@ -6,7 +6,6 @@ export default {
   responseType: 'json',
   withCredentials: true, // 是否允许带cookie这些
   headers: {
-    'Content-Type': 'application/json;charset=utf-8',
-    'Authorization': '123456789'
+    'Content-Type': 'application/json;charset=utf-8'
   }
 }
