@@ -3,7 +3,7 @@ import {createAxios} from '@/base-lib/utils/axios'
 export function login(data) {
   return createAxios({
     method: 'post',
-    url: '/user/login'
+    url: '/admin/login'
   }).request({
     data
   })

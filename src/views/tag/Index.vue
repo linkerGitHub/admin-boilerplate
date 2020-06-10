@@ -3,6 +3,7 @@
     <manage-table
       :columns-definition="def"
       :data-src-url="'/tag'"
+      :axios-requester="$genAxiosInstanceFn()"
     />
   </div>
 </template>

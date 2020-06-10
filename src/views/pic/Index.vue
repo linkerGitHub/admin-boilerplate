@@ -10,6 +10,7 @@
       :new-one-click-handle="newOneClickHandle"
       :before-edit-dialog-open="beforeEditOpenHandle"
       :edit-click-handle="editOneClickHandle"
+      :axios-requester="$genAxiosInstanceFn()"
     >
       <template v-slot:newOneForm="{ formData }">
         <el-form
@@ -25,7 +26,7 @@
               :upload-url="uploadUrl"
               :file-list-of-uploader.sync="uploaderFile.newOne"
               :limit="1"
-              :headers="{authorization: '123456789'}"
+              :headers="{authorization: $store.state.auth.token}"
               :on-success-call="uploadSuccessHandleForNew"
               @change="uploaderFileChangeHandle(formData, ...arguments)"
             />
@@ -170,7 +171,7 @@
               :file-list-of-uploader.sync="uploaderFile.newOne"
               :file-list="[{url: picAddr + formData.pic_key + '?preview=1&scale=10'}]"
               :limit="1"
-              :headers="{authorization: '123456789'}"
+              :headers="{authorization: $store.state.auth.token}"
               :on-success-call="uploadSuccessHandleForNew"
               @change="uploaderFileChangeHandle(formData, ...arguments)"
             />
@@ -360,10 +361,12 @@ export default {
   },
   methods: {
     beforeEditOpenHandle(data) {
+      const loading = this.$loading()
       return new Promise((resolve) => {
         getPicById(data.id).then(res => {
-          console.log(res)
           resolve(res.data.data.rows[0])
+        }).finally(() => {
+          loading.close()
         })
       })
     },

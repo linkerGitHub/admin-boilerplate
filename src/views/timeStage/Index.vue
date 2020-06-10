@@ -5,6 +5,7 @@
       :data-src-url="'/time-stage'"
       :edit-success="() => {$store.dispatch('reloadTimeStage')}"
       :save-success="() => {$store.dispatch('reloadTimeStage')}"
+      :axios-requester="$genAxiosInstanceFn()"
     />
   </div>
 </template>

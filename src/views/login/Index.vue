@@ -12,7 +12,7 @@
         prop="name"
       >
         <el-input
-          v-model="form.name"
+          v-model="form.admin_name"
           placeholder="用户名"
         />
       </el-form-item>
@@ -20,7 +20,7 @@
         prop="password"
       >
         <el-input
-          v-model="form.password"
+          v-model="form.admin_pass"
           type="password"
           placeholder="密码"
         />
@@ -46,14 +46,14 @@ export default {
   data() {
     return {
       form: {
-        name: '',
-        password: ''
+        admin_name: '',
+        admin_pass: ''
       },
       rule: {
-        name: [
+        admin_name: [
           { required: true, message: '请输入用户名' }
         ],
-        password: [
+        admin_pass: [
           { required: true, message: '请输入密码' }
         ]
       }
@@ -64,7 +64,10 @@ export default {
       this.$refs.form.validate((valid) => {
         if(valid) {
           login(this.form).then(res => {
-            console.log(res)
+            const auth = JSON.stringify(res.data.data.data)
+            localStorage.setItem('auth', auth)
+            this.$store.commit('setAuth', res.data.data.data)
+            this.$router.push({name : 'index'})
           })
         }
       })
