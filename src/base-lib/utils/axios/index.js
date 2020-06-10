@@ -2,6 +2,7 @@ import axios from 'axios'
 import config from './config'
 import router from '@/route/index'
 import { Message } from 'element-ui'
+import store from '@/store'
 
 axios.defaults = {
   ...axios.defaults,
@@ -46,6 +47,15 @@ function setInterceptor(axiosInstance) {
       const statusCode = response.data.statusCode
       switch (statusCode) {
       case 401:
+        // 清空auth
+        if(localStorage.getItem('auth') !== null) {
+          localStorage.removeItem('auth')
+        }
+        if(store.state.auth.token) {
+          store.commit('setAuth', {})
+        }
+
+        // 转到登陆
         if(router.currentRoute.name !== 'login') {
           router.push({name: 'login'})
         }
