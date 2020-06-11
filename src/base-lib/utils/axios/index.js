@@ -28,6 +28,7 @@ function setInterceptor(axiosInstance) {
   axiosInstance.interceptors.response.use(
     res => {
       // TODO 配置数据响应处理
+      const response = res
       const statusCode = res.data.statusCode
       switch (statusCode) {
       case 200:
@@ -35,7 +36,7 @@ function setInterceptor(axiosInstance) {
       default:
         Message({
           type: 'error',
-          message: res.data.msg
+          message: response.data.error.description
         })
       }
       return res
@@ -45,6 +46,7 @@ function setInterceptor(axiosInstance) {
       const response = error.response
       // TODO 配置数据响应处理
       const statusCode = response.data.statusCode
+
       switch (statusCode) {
       case 401:
         // 清空auth
