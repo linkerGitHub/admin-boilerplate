@@ -69,6 +69,8 @@ export const routes = [
     beforeEnter: (to, from, next) => {
       if(localStorage.getItem('auth') !== null) {
         next({ name: 'index' })
+      } else {
+        next()
       }
     }
   }

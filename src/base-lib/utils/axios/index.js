@@ -57,6 +57,7 @@ function setInterceptor(axiosInstance) {
 
         // 转到登陆
         if(router.currentRoute.name !== 'login') {
+          console.log(router.currentRoute.name !== 'login')
           router.push({name: 'login'})
         }
         // eslint-disable-next-line no-fallthrough
