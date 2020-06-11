@@ -6,6 +6,7 @@ module.exports = {
       idxConfig: 'IdxConfig'
     }
   },
+
   pluginOptions: {
     'style-resources-loader': {
       preProcessor: 'less',
@@ -13,5 +14,7 @@ module.exports = {
         path.resolve(__dirname, './src/style/style-var-predefine.less'),
       ]
     }
-  }
+  },
+
+  publicPath: ''
 }
