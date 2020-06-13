@@ -84,7 +84,7 @@ export default {
     initialCenter: {
       type: Array,
       default() {
-        return [103.61036691794625, 32.700350524387304]
+        return [104.065735,30.660053]
       }
     },
     additionMapInitJob: {
@@ -111,12 +111,21 @@ export default {
   },
   computed: {
     drawLayerVertexData() {
-      if (this.drawLayer !== null && this.drawLayer._latlngs[0] && this.drawLayer._latlngs[0].length > 0) {
+      if (this.drawLayer !== null && this.drawLayer._latlngs[0]) {
         const ret = []
-        const latlngs = this.drawLayer._latlngs[0]
-        for (let i = 0; i < latlngs.length; i++) {
-          const tempLatlng = latlngs[i]
-          ret.push([tempLatlng.lat, tempLatlng.lng])
+        if(this.drawLayer._latlngs[0].constructor === Array) {
+          const latlngs = this.drawLayer._latlngs[0]
+          for (let i = 0; i < latlngs.length; i++) {
+            const tempLatlng = latlngs[i]
+            ret.push([tempLatlng.lat, tempLatlng.lng])
+          }
+        }
+        if(this.drawLayer._latlngs[0].constructor === Object) {
+          const latlngs = this.drawLayer._latlngs
+          for (let i = 0; i < latlngs.length; i++) {
+            const tempLatlng = latlngs[i]
+            ret.push([tempLatlng.lat, tempLatlng.lng])
+          }
         }
         return ret
       } else {
@@ -156,12 +165,10 @@ export default {
         minZoom: 5
       })
 
-      const baseLayers = {
+      this.baseLayer = {
         'normalMap': normalMap,
         'routeMap': routeMap
       }
-
-      this.baseLayer = baseLayers
 
       const mapElem = this.$el.getElementsByClassName('map')[0]
       const map = L.map(mapElem, {

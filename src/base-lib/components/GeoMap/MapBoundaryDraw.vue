@@ -4,20 +4,22 @@
       :class="{'right-collapse-panel-active': drawProcedureStatus.drawDone}"
       class="right-collapse-panel"
     >
-      <div class="color-select-title">
-        选择轮廓颜色
+      <div v-if="useBorderColor">
+        <div class="color-select-title">
+          选择轮廓颜色
+        </div>
+        <color-pan
+          :value="initialBoundaryColor"
+          @color-change="setBoundaryColor"
+        />
       </div>
-      <color-pan
-        :value="initialBoundaryColor"
-        @color-change="setBoundaryColor"
-      />
       <div class="btn-layer-wrapper">
         <el-button
           type="primary"
           size="medium"
           @click="saveExitHandle"
         >
-          保存并退出
+          保存
         </el-button>
       </div>
       <div class="btn-layer-wrapper">
@@ -84,7 +86,7 @@
       class="undo-btn"
       @click="undoLastPoint"
     >
-      <svg-icon icon-class="undo" />撤销
+      撤销
     </el-button>
     <el-button
       round
@@ -108,10 +110,18 @@
 <script>
 import MapForEdit from './mapForEdit'
 import ColorPan from './ColorPan'
+import L from 'leaflet'
+
 export default {
   name: 'MapBoundaryDraw',
   components: { ColorPan, MapForEdit },
   props: {
+    useBorderColor: {
+      type: Boolean,
+      default() {
+        return false
+      }
+    },
     initialBoundary: {
       type: Array,
       default() {
@@ -158,6 +168,9 @@ export default {
       this.$refs['map-big'].setDataToDraw(val)
       this.$refs['map-big'].setBoundaryColor(this.initialBoundaryColor)
       this.setInitBoundary()
+      const map = this.$refs['map-big'].map
+      const layer = this.$refs['map-big'].drawLayer
+      map.fitBounds(L.latLngBounds(layer._bounds._southWest, layer._bounds._northEast))
     },
     initialBoundaryColor: function(val) {
       this.$refs['map-big'].setBoundaryColor(val)
@@ -262,10 +275,13 @@ export default {
         this.amapAutoCompleteLoad()
         this.getGeoLocation()
       }
-      const url = 'https://webapi.amap.com/maps?v=1.4.15&key=6f79f8cb0b72d9d74485a5e128da28ca&callback=onLoad'
-      const jsapi = document.createElement('script')
-      jsapi.src = url
-      document.head.appendChild(jsapi)
+      if(document.getElementById('amap-lib') === null) {
+        const url = 'https://webapi.amap.com/maps?v=1.4.15&key=13e93d0367a43e52fc0e26d62bec0b31&callback=onLoad'
+        const jsapi = document.createElement('script')
+        jsapi.src = url
+        jsapi.id = 'amap-lib'
+        document.head.appendChild(jsapi)
+      }
     },
     setInitBoundary() {
       if (this.initialBoundary.length > 0) {
@@ -344,6 +360,7 @@ export default {
       const mapComponent = this.$refs['map-big']
       this.$emit('save-call', {
         boundaryLatlng: mapComponent.getDrawPointData(),
+        boundaryCenter: L.bounds(mapComponent.getDrawPointData()).getCenter(),
         color: this.drawColor
       })
     }
@@ -352,33 +369,6 @@ export default {
 </script>
 
 <style scoped lang="less">
-  .suggestion-box{
-    background-color: #fff;
-    position: absolute;
-    top: 40px;
-    border-radius: 4px;
-    width: 100%;
-    ul {
-      list-style: none;
-      padding: 0;
-      li {
-        cursor: pointer;
-        padding: 8px 16px;
-        display: flex;
-        justify-content: space-between;
-        .district{
-          font-size: 12px;
-          color: #7d7d7d;
-        }
-        span{
-          max-width: 46%;
-        }
-        &:hover{
-          background-color: #e6e6e6;
-        }
-      }
-    }
-  }
   .right-collapse-panel {
     background-color: rgba(40,43,49,.9);
     position: absolute;
@@ -401,21 +391,37 @@ export default {
     margin-right: 20px;
     z-index: 999;
     box-shadow: none;
-    /deep/ .search-tips{
-      border: none;
-      box-shadow: 0px 0px 1px grey;
-      ul li {
-        height: 36px;
-        width: 230px;
+    line-height: 1;
+
+    .suggestion-box{
+      background-color: #fff;
+      position: absolute;
+      top: 40px;
+      border-radius: 4px;
+      width: 100%;
+      ul {
+        list-style: none;
+        padding: 0;
+        li {
+          cursor: pointer;
+          padding: 8px 16px;
+          display: flex;
+          justify-content: space-between;
+          .district{
+            font-size: 12px;
+            color: #7d7d7d;
+          }
+          span{
+            max-width: 46%;
+          }
+          &:hover{
+            background-color: #e6e6e6;
+          }
+        }
       }
-    }
-    /deep/ .search-box-wrapper .search-btn {
-      background-color: $them-color;
-      color: #ffffff;
     }
   }
   .start-draw-btn{
-    color: $them-color;
     position: absolute;
     left: 310px;
     top: 19px;
