@@ -1,33 +1,54 @@
 <template>
-  <el-submenu :index="menus.path" >
-    <template v-slot:title>
-      {{ menus.title }}
-    </template>
-    <div
-      v-for="menu in menus.children"
-      :key="menu.path"
+  <div>
+    <el-submenu
+      v-if="menus.constructor === Object && menus.children !== undefined && menus.children.length > 0 && menus.meta && menus.meta.hidden !== true"
+      :index="parentPath + menus.path"
     >
-      <el-menu-item
-        v-if="menu.children === undefined || menu.children.length === 0"
-        :index="menu.path"
-      >
-        {{ menu.title }}
-      </el-menu-item>
+      <template v-slot:title>
+        {{ menus.meta.title }}
+      </template>
       <side-menu
-        v-if="menu.children !== undefined && menu.children.length > 0"
+        v-for="menu in menus.children"
+        :key="menu.path"
+        :parent-path="parentPath + menus.path"
+        :menus="menu"
+      />
+    </el-submenu>
+    <el-menu-item
+      v-else-if="menus.constructor === Object && menuItemRequiredCondition(menus)"
+      :index="parentPath + menus.path"
+    >
+      {{ menus.meta.title }}
+    </el-menu-item>
+    <div v-else-if="menus.constructor === Array">
+      <side-menu
+        v-for="menu in menus"
+        :key="menu.path"
+        :parent-path="parentPath"
         :menus="menu"
       />
     </div>
-  </el-submenu>
+  </div>
 </template>
 
 <script>
 export default {
   name: 'SideMenu',
   props: {
+    parentPath: {
+      type: String,
+      default() {
+        return '/'
+      }
+    },
     menus: {
-      type: Object,
+      type: [Object, Array],
       required: true
+    }
+  },
+  methods: {
+    menuItemRequiredCondition(item) {
+      return item.meta !== undefined && item.meta.hidden !== true
     }
   }
 }
