@@ -9,6 +9,8 @@
       :data-shaper="dataShaper"
       :edit-success="() => {$store.dispatch('reloadPlace')}"
       :save-success="() => {$store.dispatch('reloadPlace')}"
+      edit-dialog-width="90%"
+      new-one-dialog-width="90%"
     >
       <template v-slot:newOneForm="{ formData }">
         <el-form
@@ -48,9 +50,9 @@
             label="地理坐标"
             prop="lat_lng"
           >
-            <get-position-from-map
-              v-model="formData.lat_lng"
-              style="width: 100%; height: 400px;"
+            <map-boundary-draw
+              ref="border-draw-map"
+              @save-call="boundarySave(formData, ...arguments)"
             />
           </el-form-item>
         </el-form>
@@ -93,9 +95,10 @@
             label="地理坐标"
             prop="lat_lng"
           >
-            <get-position-from-map
-              v-model="formData.lat_lng"
-              style="width: 100%; height: 400px;"
+            <map-boundary-draw
+              ref="border-draw-map"
+              :initial-boundary="convertBorder(formData.border)"
+              @save-call="boundarySave(formData, ...arguments)"
             />
           </el-form-item>
         </el-form>
@@ -106,11 +109,13 @@
 
 <script>
 import ManageTable from '@/base-lib/components/ManageTable/Index.vue'
-import GetPositionFromMap from '@/base-lib/components/GeoMap/GetPositionFromMap'
 import {getStreet} from '@/api'
+import MapBoundaryDraw from '@/base-lib/components/GeoMap/MapBoundaryDraw'
+import {convertBorder} from '@/base-lib/components/GeoMap/js/ConvertBorder2Arr'
+
 export default {
   name: 'Index',
-  components: {GetPositionFromMap, ManageTable},
+  components: {MapBoundaryDraw, ManageTable},
   data() {
     return {
       def: [
@@ -148,12 +153,21 @@ export default {
     this.getStreetDataSrc()
   },
   methods: {
+    convertBorder,
+    boundarySave(formdata, data) {
+      console.log(data)
+      formdata.border = data.boundaryLatlng.map(p => {
+        return p.join(',')
+      }).join(';')
+      formdata.lat_lng = JSON.stringify([data.boundaryCenter.x, data.boundaryCenter.y])
+    },
     dataShaper() {
       return {
         street: [],
         place_id: '',
         place_name: '',
-        lat_lng: []
+        lat_lng: [],
+        border: ''
       }
     },
     editDeal(data) {
