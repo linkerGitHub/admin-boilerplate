@@ -18,12 +18,12 @@ export default {
       def: [
         {
           prop: 'user_name',
-          label: '时间阶段',
+          label: '用户名',
           editable: true
         },
         {
           prop: 'user_pass',
-          label: '开始时间',
+          label: '密码',
           editable: true
         }
       ]
