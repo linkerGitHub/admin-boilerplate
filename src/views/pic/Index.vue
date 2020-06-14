@@ -345,6 +345,10 @@ export default {
           label: '拍摄时间'
         },
         {
+          prop: 'pic_description',
+          label: '图片描述'
+        },
+        {
           prop: 'copyright_description',
           label: '版权说明'
         }
