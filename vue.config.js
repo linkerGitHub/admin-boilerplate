@@ -3,7 +3,8 @@ module.exports = {
   configureWebpack: {
     externals: {
       ClassicEditor: 'window.ClassicEditor',
-      idxConfig: 'IdxConfig'
+      idxConfig: 'IdxConfig',
+      idxConfigOnline: 'IdxConfigOnline',
     }
   },
 
