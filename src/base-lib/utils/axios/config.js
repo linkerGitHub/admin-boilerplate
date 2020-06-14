@@ -1,5 +1,5 @@
 import * as cfg from 'idxConfig'
-import * as cfgOnline from 'IdxConfigOnline'
+import * as cfgOnline from 'idxConfigOnline'
 
 export default {
   baseURL: process.env.NODE_ENV === 'development' ? cfg.serverUrl : cfgOnline.serverUrl,
