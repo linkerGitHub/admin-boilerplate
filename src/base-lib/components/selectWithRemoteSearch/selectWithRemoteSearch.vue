@@ -16,9 +16,7 @@
       :key="item[valueKey]"
       :label="item[labelKey]"
       :value="objectValue ? item : item[valueKey]"
-    >
-      {{ item[labelKey] }} - {{ item[valueKey] }}
-    </el-option>
+    />
   </el-select>
 </template>
 
@@ -102,22 +100,24 @@ export default {
       immediate: true
     }
   },
+  mounted() {
+    this.remoteMethod('')
+  },
   methods: {
     remoteMethod(query) {
-      if (query !== '') {
-        this.loading = true;
-        const params = {}
-        params[this.labelKey] = query
-        this.axiosRequester.request({
-          url: this.dataSrcUrl,
-          params
-        }).then(res => {
-          this.options = res.data.data.rows
-          this.loading = false
-        })
-      } else {
-        this.options = [];
+      this.loading = true;
+      const params = {
+        take: 100,
+        skip: 0
       }
+      params[this.labelKey] = query
+      this.axiosRequester.request({
+        url: this.dataSrcUrl,
+        params
+      }).then(res => {
+        this.options = res.data.data.rows
+        this.loading = false
+      })
     }
   }
 }
