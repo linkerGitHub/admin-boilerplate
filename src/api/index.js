@@ -51,3 +51,10 @@ export function getPicById(id) {
     url: '/pic/'+id
   }).request({})
 }
+
+export function getCollectionById(id) {
+  return createAxios({
+    method: 'get',
+    url: '/collection/'+id
+  }).request({})
+}
