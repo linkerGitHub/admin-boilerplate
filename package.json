@@ -11,6 +11,7 @@
     "@geoman-io/leaflet-geoman-free": "^2.5.0",
     "axios": "^0.19.2",
     "core-js": "^3.6.4",
+    "dayjs": "^1.8.28",
     "element-ui": "^2.13.0",
     "exif-js": "^2.3.0",
     "leaflet": "^1.6.0",

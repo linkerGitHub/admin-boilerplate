@@ -154,6 +154,15 @@
               type="textarea"
             />
           </el-form-item>
+          <el-form-item
+            label="肖像权/物权"
+            prop="pic_thing_right"
+          >
+            <el-input
+              v-model="formData.pic_thing_right"
+              type="textarea"
+            />
+          </el-form-item>
         </el-form>
       </template>
       <template v-slot:editForm="{ formData }">
@@ -299,6 +308,15 @@
               type="textarea"
             />
           </el-form-item>
+          <el-form-item
+            label="肖像权/物权"
+            prop="pic_thing_right"
+          >
+            <el-input
+              v-model="formData.pic_thing_right"
+              type="textarea"
+            />
+          </el-form-item>
         </el-form>
       </template>
     </manage-table>
@@ -314,6 +332,9 @@ import GetPositionFromMap from '@/base-lib/components/GeoMap/GetPositionFromMap'
 import SelectWithRemoteSearch from '@/base-lib/components/selectWithRemoteSearch/selectWithRemoteSearch'
 import {picAddr} from '@/constant'
 import {getPicById} from '@/api'
+import dayjs from 'dayjs'
+
+window.dayjs = dayjs
 export default {
   name: 'Index',
   components: {SelectWithRemoteSearch, GetPositionFromMap, Uploader, ManageTable},
@@ -438,10 +459,21 @@ export default {
       })
     },
     uploaderFileChangeHandle(fd, file) {
+      fd.pic_description = file.name.split('.').slice(0, -1).join('.')
       EXIF.getData(file.raw, function() {
-        console.log(EXIF.getAllTags(this));
-        const Orientation = EXIF.getTag(this, 'Orientation');
-        console.log(Orientation)
+        const info = EXIF.getAllTags(this)
+        console.log(info)
+        let datetimeStr = new Date().toString()
+        if(info.DateTime) {
+          const tempDateStr = info.DateTime.split(' ')
+          datetimeStr = tempDateStr[0].split(':').join('-') + ' ' + tempDateStr[1]
+        }
+        fd.pic_shot_time = dayjs(datetimeStr).toDate()
+        fd.copyright_description = info.Copyright || ''
+        if(info.PixelXDimension && info.PixelYDimension) {
+          fd.pic_size = info.PixelXDimension + 'x' + info.PixelYDimension
+        }
+        fd.pic_no_code = dayjs(datetimeStr).toDate().getTime()
       })
     }
   }
