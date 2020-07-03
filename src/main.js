@@ -12,7 +12,7 @@ Vue.config.productionTip = false
 // 加载初始化
 const auth = localStorage.getItem('auth')
 if(auth !== null) {
-  store.commit('setAuth', auth)
+  store.commit('setAuth', JSON.parse(auth))
 }
 
 

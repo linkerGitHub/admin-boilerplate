@@ -652,10 +652,10 @@ export default {
             this.axiosRequester.request({
               method: 'delete',
               ...res
-            }).then(resolve => {
-              if(resolve.data.success) {
+            }).then(re => {
+              if(this.assertRequestSuccess(re)) {
                 // TODO 成功后数据操作，后续需要完善
-
+                this.formDataRequest()
               }
             })
           })
@@ -664,7 +664,8 @@ export default {
     },
     // 新建请求
     newOneFormConfirmHandle() {
-      this.newOneDeal(this.innerFormDataTemp.newOne).then((res) => {
+      const detachedData = JSON.parse(JSON.stringify(this.innerFormDataTemp.newOne))
+      this.newOneDeal(detachedData).then((res) => {
         this.newOneSaveReq(res)
         this.dialogStatus.newOne = false
       }).catch(err => {

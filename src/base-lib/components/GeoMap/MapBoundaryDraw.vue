@@ -271,16 +271,20 @@ export default {
       })
     },
     loadAmapLib() {
-      window.onLoad = () => {
-        this.amapAutoCompleteLoad()
-        this.getGeoLocation()
-      }
       if(document.getElementById('amap-lib') === null) {
         const url = 'https://webapi.amap.com/maps?v=1.4.15&key=13e93d0367a43e52fc0e26d62bec0b31&callback=onLoad'
         const jsapi = document.createElement('script')
         jsapi.src = url
         jsapi.id = 'amap-lib'
         document.head.appendChild(jsapi)
+
+        window.onLoad = () => {
+          this.amapAutoCompleteLoad()
+          this.getGeoLocation()
+        }
+      } else {
+        this.amapAutoCompleteLoad()
+        this.getGeoLocation()
       }
     },
     setInitBoundary() {

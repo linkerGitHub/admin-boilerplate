@@ -72,7 +72,7 @@
                 v-for="op in $store.state.dataSrc.timeStage"
                 :key="op.id"
                 :label="op.stage_name"
-                :value="op.id"
+                :value="op"
               />
             </el-select>
           </el-form-item>
@@ -89,7 +89,7 @@
                 v-for="op in $store.state.dataSrc.street"
                 :key="op.id"
                 :label="op.street_name"
-                :value="op.id"
+                :value="op"
               />
             </el-select>
           </el-form-item>
@@ -106,7 +106,7 @@
                 v-for="op in $store.state.dataSrc.place"
                 :key="op.id"
                 :label="op.place_name"
-                :value="op.id"
+                :value="op"
               />
             </el-select>
           </el-form-item>
@@ -422,6 +422,7 @@ export default {
     dataShaper() {
       return {
         copyright_description: '',
+        pic_thing_right: '',
         item_status: 1,
         lat_lng: [],
         pic_description: '',
@@ -436,6 +437,7 @@ export default {
     },
     editDeal(data) {
       const tmp = data
+      console.log(tmp)
       if(tmp.lat_lng.constructor === Array) {
         tmp.lat_lng = JSON.stringify(tmp.lat_lng)
       }
@@ -454,6 +456,7 @@ export default {
       tmp.time_stage = tmp.time_stage.map(item => {
         return item.id
       })
+      console.log(tmp)
       return new Promise(resolve => {
         resolve(tmp)
       })
@@ -468,7 +471,7 @@ export default {
           const tempDateStr = info.DateTime.split(' ')
           datetimeStr = tempDateStr[0].split(':').join('-') + ' ' + tempDateStr[1]
         }
-        fd.pic_shot_time = dayjs(datetimeStr).toDate()
+        fd.pic_shot_time = dayjs(datetimeStr).format('YYYY-MM-DD HH:mm:ss')
         fd.copyright_description = info.Copyright || ''
         if(info.PixelXDimension && info.PixelYDimension) {
           fd.pic_size = info.PixelXDimension + 'x' + info.PixelYDimension
