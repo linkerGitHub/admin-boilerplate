@@ -421,8 +421,8 @@ export default {
     },
     dataShaper() {
       return {
-        copyright_description: '',
-        pic_thing_right: '',
+        copyright_description: '暂无',
+        pic_thing_right: '暂无',
         item_status: 1,
         lat_lng: [],
         pic_description: '',
@@ -432,12 +432,12 @@ export default {
         pic_size: '',
         place: [],
         street: [],
-        time_stage: []
+        time_stage: [],
+        collection: []
       }
     },
     editDeal(data) {
       const tmp = data
-      console.log(tmp)
       if(tmp.lat_lng.constructor === Array) {
         tmp.lat_lng = JSON.stringify(tmp.lat_lng)
       }
@@ -456,7 +456,6 @@ export default {
       tmp.time_stage = tmp.time_stage.map(item => {
         return item.id
       })
-      console.log(tmp)
       return new Promise(resolve => {
         resolve(tmp)
       })
@@ -476,7 +475,7 @@ export default {
         if(info.PixelXDimension && info.PixelYDimension) {
           fd.pic_size = info.PixelXDimension + 'x' + info.PixelYDimension
         }
-        fd.pic_no_code = dayjs(datetimeStr).toDate().getTime()
+        fd.pic_no_code = dayjs(datetimeStr).format('YYYYMMDD_HHmm-') + new Date().getMilliseconds()
       })
     }
   }

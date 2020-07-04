@@ -117,6 +117,13 @@ export default {
         {
           prop: 'pic_count',
           label: '图片数量'
+        },
+        {
+          prop: 'item_status',
+          label: '是否系统数据',
+          nodeExpress: function (h, val) {
+            return val === 1 ? '否' : '是'
+          }
         }
       ],
       tmp: {
