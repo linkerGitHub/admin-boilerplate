@@ -9,6 +9,7 @@
       :file-list="fileList"
       list-type="picture-card"
       :auto-upload="false"
+      :on-progress="showLoading"
       :on-success="onSuccess"
       :on-change="uploaderFileChangeHandle"
       :limit="limit"
@@ -23,6 +24,7 @@
       :show-file-list="false"
       :auto-upload="false"
       :on-success="onSuccess"
+      :on-progress="showLoading"
       :on-change="uploaderFileChangeHandle"
     >
       <img
@@ -91,7 +93,8 @@ export default {
   },
   data() {
     return {
-      files: this.fileList
+      files: this.fileList,
+      loading: null
     }
   },
   watch: {
@@ -115,11 +118,15 @@ export default {
     })
   },
   methods: {
+    showLoading() {
+      this.loading = this.$loading()
+    },
     submit() {
       this.$refs.uploader.submit()
     },
     onSuccess(res, file, fileList) {
       this.onSuccessCall(res, file, fileList)
+      this.loading.close()
     },
     uploaderFileChangeHandle(file, fileList) {
       if(this.limit === 1) {

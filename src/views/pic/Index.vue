@@ -433,7 +433,8 @@ export default {
         place: [],
         street: [],
         time_stage: [],
-        collection: []
+        collection: [],
+        tag: []
       }
     },
     editDeal(data) {
@@ -471,7 +472,7 @@ export default {
           datetimeStr = tempDateStr[0].split(':').join('-') + ' ' + tempDateStr[1]
         }
         fd.pic_shot_time = dayjs(datetimeStr).format('YYYY-MM-DD HH:mm:ss')
-        fd.copyright_description = info.Copyright || ''
+        fd.copyright_description = info.Copyright || '暂无'
         if(info.PixelXDimension && info.PixelYDimension) {
           fd.pic_size = info.PixelXDimension + 'x' + info.PixelYDimension
         }
