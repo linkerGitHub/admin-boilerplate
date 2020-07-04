@@ -6,6 +6,7 @@
       :axios-requester="$genAxiosInstanceFn()"
       :edit-deal="editDeal"
       :new-one-deal="editDeal"
+      :data-shaper="dataShaper"
       :before-edit-dialog-open="beforeEditOpenHandle"
     >
       <template v-slot:newOneForm="{ formData }">
@@ -121,7 +122,7 @@ export default {
         {
           prop: 'item_status',
           label: '是否系统数据',
-          nodeExpress: function (h, val) {
+          textContent: function (val) {
             return val === 1 ? '否' : '是'
           }
         }
@@ -132,6 +133,14 @@ export default {
     }
   },
   methods: {
+    dataShaper() {
+      return {
+        collection_name: '',
+        collection_description: '',
+        tag: [],
+        user: []
+      }
+    },
     editDeal(data) {
       const tmp = data
       tmp.user = tmp.user.map(item => {

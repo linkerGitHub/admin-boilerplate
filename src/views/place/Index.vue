@@ -120,10 +120,6 @@ export default {
     return {
       def: [
         {
-          prop: 'id',
-          label: 'id'
-        },
-        {
           prop: 'place_name',
           label: '位置名称',
           editable: true,
