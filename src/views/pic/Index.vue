@@ -407,6 +407,9 @@ export default {
                 src: config.baseURL + '/retrieve-file/' + val + '?preview=1&scale=10',
                 lazy: true,
                 fit: 'cover'
+              },
+              style: {
+                'min-width': '200px'
               }
             })
           }
