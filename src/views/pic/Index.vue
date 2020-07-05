@@ -23,6 +23,7 @@
           >
             <uploader
               ref="picUploadForNew"
+              v-popover:samePicTestPop
               :upload-url="uploadUrl"
               :file-list-of-uploader.sync="uploaderFile.newOne"
               :limit="1"
@@ -30,6 +31,30 @@
               :on-success-call="uploadSuccessHandleForNew"
               @change="uploaderFileChangeHandle(formData, ...arguments)"
             />
+
+            <el-popover
+              ref="samePicTestPop"
+              v-model="samePicTestShow"
+              placement="left"
+              title="相似图片"
+              width="200"
+              trigger="hover"
+            >
+              <div
+                v-if="samePicTestResult.length > 0"
+              >
+                <el-image
+                  :src="samePicTestResult"
+                />
+                <div style="text-align: center;">
+                  <div>差异度:{{ samePicDistance }}</div>
+                  <div>(0-64之间，数值越小越相似)</div>
+                </div>
+              </div>
+              <div v-else>
+                暂无
+              </div>
+            </el-popover>
           </el-form-item>
           <el-form-item
             label="图像编号"
@@ -176,6 +201,7 @@
           >
             <uploader
               ref="picUploadForEdit"
+              v-popover:samePicTestPop
               :upload-url="uploadUrl"
               :file-list-of-uploader.sync="uploaderFile.newOne"
               :file-list="[{url: picAddr + formData.pic_key + '?preview=1&scale=10'}]"
@@ -184,6 +210,30 @@
               :on-success-call="uploadSuccessHandleForNew"
               @change="uploaderFileChangeHandle(formData, ...arguments)"
             />
+
+            <el-popover
+              ref="samePicTestPop"
+              v-model="samePicTestShow"
+              placement="left"
+              title="相似图片"
+              width="200"
+              trigger="hover"
+            >
+              <div
+                v-if="samePicTestResult.length > 0"
+              >
+                <el-image
+                  :src="samePicTestResult"
+                />
+                <div style="text-align: center;">
+                  <div>差异度:{{ samePicDistance }}</div>
+                  <div>(0-64之间，数值越小越相似)</div>
+                </div>
+              </div>
+              <div v-else>
+                暂无
+              </div>
+            </el-popover>
           </el-form-item>
           <el-form-item
             label="图像编号"
@@ -331,8 +381,9 @@ import EXIF from 'exif-js'
 import GetPositionFromMap from '@/base-lib/components/GeoMap/GetPositionFromMap'
 import SelectWithRemoteSearch from '@/base-lib/components/selectWithRemoteSearch/selectWithRemoteSearch'
 import {picAddr} from '@/constant'
-import {getPicById} from '@/api'
+import {getPic, getPicById} from '@/api'
 import dayjs from 'dayjs'
+import {picDHash} from '@/views/utils/picDHash'
 
 window.dayjs = dayjs
 export default {
@@ -340,6 +391,9 @@ export default {
   components: {SelectWithRemoteSearch, GetPositionFromMap, Uploader, ManageTable},
   data() {
     return {
+      samePicTestShow: false,
+      samePicTestResult: '',
+      samePicDistance: '',
       picAddr,
       uploadUrl: config.baseURL + '/upload-file',
       def: [
@@ -434,7 +488,8 @@ export default {
         street: [],
         time_stage: [],
         collection: [],
-        tag: []
+        tag: [],
+        d_hash: 0
       }
     },
     editDeal(data) {
@@ -462,6 +517,28 @@ export default {
       })
     },
     uploaderFileChangeHandle(fd, file) {
+      const fileReader = new FileReader()
+      fileReader.onloadend = (e) => {
+        picDHash(e.target.result).then(res => {
+          fd.d_hash = res
+          getPic({
+            skip: 0,
+            take: 1,
+            d_hash: res,
+            order_by: 'hd'
+          }).then(re => {
+            if(re.data.data.rows.length > 0) {
+              this.samePicTestResult = config.baseURL + '/retrieve-file/' + re.data.data.rows[0].pic_key + '?preview=1&scale=10'
+              this.samePicTestShow = true
+              this.samePicDistance = re.data.data.rows[0].hd
+            } else {
+              this.samePicTestResult = ''
+            }
+          })
+        })
+      }
+      fileReader.readAsDataURL(file.raw);
+
       fd.pic_description = file.name.split('.').slice(0, -1).join('.')
       EXIF.getData(file.raw, function() {
         const info = EXIF.getAllTags(this)
