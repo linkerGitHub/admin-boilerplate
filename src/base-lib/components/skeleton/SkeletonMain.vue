@@ -5,27 +5,10 @@
         :router="true"
         :default-active="activeTab"
       >
-        <div
-          v-for="menu in menuRoutes"
-          :key="menu.path"
-        >
-          <side-menu
-            v-if="menu.children && menu.children.length > 0"
-            :menus="menu"
-          />
-          <el-menu-item
-            v-else-if="menu.action"
-            @click="menu.action"
-          >
-            {{ menu.title }}
-          </el-menu-item>
-          <el-menu-item
-            v-else
-            :index="menu.path"
-          >
-            {{ menu.title }}
-          </el-menu-item>
-        </div>
+        <side-menu
+          parent-path="/index"
+          :menus="menuRoutes"
+        />
       </el-menu>
     </el-aside>
     <el-container>
@@ -60,6 +43,9 @@
 <script>
 import menuRoutes from '../../../route/menu-routes'
 import SideMenu from './SideMenu'
+
+console.log(menuRoutes)
+
 export default {
   name: 'SkeletonMain',
   components: {SideMenu},
