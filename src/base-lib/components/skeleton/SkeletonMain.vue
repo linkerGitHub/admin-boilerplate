@@ -14,6 +14,12 @@
             :menus="menu"
           />
           <el-menu-item
+            v-else-if="menu.action"
+            @click="menu.action"
+          >
+            {{ menu.title }}
+          </el-menu-item>
+          <el-menu-item
             v-else
             :index="menu.path"
           >
