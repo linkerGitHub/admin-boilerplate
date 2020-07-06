@@ -95,6 +95,9 @@
         :prop="col.prop"
         :class-name="(col.className ? col.className : '') + ' ' + ('tbl-col-' + key) + ' ' + (innerComponentStatus.tableColShowFlag[key] ? 'col-show' : 'col-hide')"
         :label="col.label"
+        :filters="col.filters"
+        :filter-method="col.filterMethod"
+        :filter-placement="col.filterPlacement"
         :width="col.width"
       >
         <template v-slot="scope">
