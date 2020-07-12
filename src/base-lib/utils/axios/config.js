@@ -4,14 +4,14 @@ import * as cfgMainland from 'idxConfigMainland'
 
 let useCfg = cfg
 
-switch (process.env.NODE_ENV) {
-case 'production':
-  useCfg = cfgOnline
-  break
-case 'pro_dev_aliyun':
+switch (process.env.BASE_URL) {
+case 'aliyun':
   useCfg = cfgMainland
   break
 default:
+  if(process.env.NODE_ENV === 'production') {
+    useCfg = cfgOnline
+  }
   break
 }
 
