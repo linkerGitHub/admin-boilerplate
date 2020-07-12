@@ -1,6 +1,5 @@
 const IdxConfig = {
   serverUrl: 'http://localhost:8080'
-
 }
 
 const IdxConfigOnline = {
