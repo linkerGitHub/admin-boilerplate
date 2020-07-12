@@ -4,8 +4,7 @@ import * as cfgMainland from 'idxConfigMainland'
 
 let useCfg = cfg
 
-console.log(process.env)
-switch (process.env.BASE_URL) {
+switch (process.env.VUE_APP_MY_ENV) {
 case 'aliyun':
   useCfg = cfgMainland
   break
