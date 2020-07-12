@@ -5,6 +5,7 @@ module.exports = {
       ClassicEditor: 'window.ClassicEditor',
       idxConfig: 'IdxConfig',
       idxConfigOnline: 'IdxConfigOnline',
+      idxConfigMainland: 'IdxConfigMainland',
     }
   },
 

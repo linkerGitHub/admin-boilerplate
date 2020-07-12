@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:aliyun": "vue-cli-service build --mode pro_dev_aliyun",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

@@ -404,7 +404,7 @@ export default {
           nodeExpress: function (h, val) {
             return h('el-image', {
               props: {
-                src: config.baseURL + '/retrieve-file/' + val + '?preview=1&scale=10',
+                src: config.baseURL + '/retrieve-file/' + val + '?preview=1&width=200',
                 lazy: true,
                 fit: 'cover'
               },

@@ -3,6 +3,7 @@ import config from './config'
 import router from '@/route/index'
 import { Message } from 'element-ui'
 import store from '@/store'
+import Cookies from 'js-cookie'
 
 axios.defaults = {
   ...axios.defaults,
@@ -56,6 +57,8 @@ function setInterceptor(axiosInstance) {
         if(store.state.auth.token) {
           store.commit('setAuth', {})
         }
+
+        Cookies.remove('AUTHORIZATION')
 
         // 转到登陆
         if(router.currentRoute.name !== 'login') {

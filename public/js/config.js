@@ -6,3 +6,7 @@ const IdxConfig = {
 const IdxConfigOnline = {
   serverUrl: 'http://dev_api.idxstudio.win/jinniu_dfz_tupianku'
 }
+
+const IdxConfigMainland = {
+  serverUrl: 'http://dev_api_mianland.idxstudio.win/jinniu_dfz_tupianku'
+}
