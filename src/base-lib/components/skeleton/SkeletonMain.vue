@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import menuRoutes from '../../../route/menu-routes'
+import menuRoutes from '@/route/menu-routes'
 import SideMenu from './SideMenu'
 export default {
   name: 'SkeletonMain',

@@ -42,6 +42,7 @@
 import {login} from '@/api'
 import Cookies from 'js-cookie'
 import dayjs from 'dayjs'
+import config from '@/base-lib/utils/axios/config'
 
 export default {
   name: 'Index',
@@ -75,7 +76,7 @@ export default {
             // console.log('expiresMins = ',expiresTime)
             const inFifteenMinutes = new Date(new Date().getTime() + (expiresTime - 1000 * 60 * expiresMinusHours));
             // console.log('inFifteenMinutes = ',inFifteenMinutes)
-            Cookies.set('AUTHORIZATION', res.data.data.data.token, { expires : inFifteenMinutes})
+            Cookies.set('AUTHORIZATION', res.data.data.data.token, { expires : inFifteenMinutes, domain: config.baseURL })
 
             this.$router.push({name : 'index'})
           })

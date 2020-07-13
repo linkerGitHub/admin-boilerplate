@@ -10,7 +10,7 @@
       <side-menu
         v-for="menu in menus.children"
         :key="menu.path"
-        :parent-path="parentPath + menus.path"
+        :parent-path="parentPath + '/' + menus.path"
         :menus="menu"
       />
     </el-submenu>
@@ -19,6 +19,12 @@
       :index="parentPath + menus.path"
     >
       {{ menus.meta.title }}
+    </el-menu-item>
+    <el-menu-item
+      v-else-if="menus.constructor === Object"
+      @click="menus.action"
+    >
+      {{ menus.title }}
     </el-menu-item>
     <div v-else-if="menus.constructor === Array">
       <side-menu
