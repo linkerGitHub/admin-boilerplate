@@ -38,7 +38,7 @@ export function getTimeStage(params) {
 
 export function logout() {
   return createAxios({
-    method: 'get',
+    method: 'post',
     url: '/admin/logout'
   }).request({})
 }
