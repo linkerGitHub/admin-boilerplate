@@ -40,9 +40,6 @@
 
 <script>
 import {login} from '@/api'
-import Cookies from 'js-cookie'
-import dayjs from 'dayjs'
-import config from '@/base-lib/utils/axios/config'
 
 export default {
   name: 'Index',
@@ -70,14 +67,6 @@ export default {
             const auth = JSON.stringify(res.data.data.data)
             localStorage.setItem('auth', auth)
             this.$store.commit('setAuth', res.data.data.data)
-
-            const expiresMinusHours = 1  // 实际auth 有效时间要减去的时间
-            const expiresTime = dayjs(res.data.data.data.expired_at).toDate().getTime() - dayjs(res.data.data.data.created_at).toDate().getTime()
-            // console.log('expiresMins = ',expiresTime)
-            const inFifteenMinutes = new Date(new Date().getTime() + (expiresTime - 1000 * 60 * expiresMinusHours));
-            // console.log('inFifteenMinutes = ',inFifteenMinutes)
-            Cookies.set('AUTHORIZATION', res.data.data.data.token, { expires : inFifteenMinutes, domain: config.baseURL })
-
             this.$router.push({name : 'index'})
           })
         }

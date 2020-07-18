@@ -1,11 +1,10 @@
 import { routes, default as router } from './index'
-import Cookies from 'js-cookie'
 import store from '@/store'
 
 const indexRoute = routes[1]
 
 import {MessageBox} from 'element-ui';
-import config from '@/base-lib/utils/axios/config'
+import {logout} from '@/api'
 export default [...indexRoute.children, {
   path: '/logout',
   action: function() {
@@ -14,11 +13,14 @@ export default [...indexRoute.children, {
       cancelButtonText: '取消',
       type: 'warning'
     }).then(() => {
-      store.commit('setUserInfo', {})
-      store.commit('setAuth', {})
-      localStorage.removeItem('auth')
-      Cookies.remove('AUTHORIZATION', { path: '', domain: config.baseURL })
-      router.push({ name: 'login' })
+      logout().then(() => {
+        store.commit('setUserInfo', {})
+        store.commit('setAuth', {})
+        localStorage.removeItem('auth')
+        router.push({ name: 'login' })
+      })
+    }).catch((err) => {
+      console.log(err)
     })
   },
   title: '注销'

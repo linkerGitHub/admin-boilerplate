@@ -36,6 +36,13 @@ export function getTimeStage(params) {
   })
 }
 
+export function logout() {
+  return createAxios({
+    method: 'get',
+    url: '/admin/logout'
+  }).request({})
+}
+
 export function getPic(params) {
   return createAxios({
     method: 'get',
