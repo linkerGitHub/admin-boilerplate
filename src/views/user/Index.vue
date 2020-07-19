@@ -24,7 +24,8 @@ export default {
         {
           prop: 'user_pass',
           label: '密码',
-          editable: true
+          editable: true,
+          visible: false
         }
       ]
     }

@@ -11,7 +11,54 @@
       :before-edit-dialog-open="beforeEditOpenHandle"
       :edit-click-handle="editOneClickHandle"
       :axios-requester="$genAxiosInstanceFn()"
+      :edit-dialog-close="clearSamePicTestResult"
+      :new-one-dialog-close="clearSamePicTestResult"
+      :extra-params="computedFilter"
     >
+      <template v-slot:searchBar>
+        <el-row>
+          <el-col :span="12">
+            <el-form inline>
+              <el-button
+                size="small"
+                type="success"
+                @click="enablePics"
+              >
+                启用
+              </el-button>
+              <el-button
+                size="small"
+                type="warning"
+                @click="disablePics"
+              >
+                禁用
+              </el-button>
+            </el-form>
+          </el-col>
+          <el-col
+            :span="12"
+            style="text-align: right;"
+          >
+            <el-form inline>
+              <el-select
+                v-model="filter.item_status"
+                size="small"
+              >
+                <el-option
+                  :value="''"
+                  label="所有"
+                />
+                <el-option
+                  v-for="(s, k) of statusMap"
+                  :key="k"
+                  :value="k"
+                  :label="s"
+                />
+              </el-select>
+            </el-form>
+          </el-col>
+        </el-row>
+      </template>
       <template v-slot:newOneForm="{ formData }">
         <el-form
           :model="formData"
@@ -23,18 +70,18 @@
           >
             <uploader
               ref="picUploadForNew"
-              v-popover:samePicTestPop
+              v-popover:samePicTestPopNew
               :upload-url="uploadUrl"
               :file-list-of-uploader.sync="uploaderFile.newOne"
               :limit="1"
               :headers="{authorization: $store.state.auth.token}"
               :on-success-call="uploadSuccessHandleForNew"
-              @change="uploaderFileChangeHandle(formData, ...arguments)"
+              @change="uploaderFileChangeHandle(formData, ...arguments, 'new')"
             />
 
             <el-popover
-              ref="samePicTestPop"
-              v-model="samePicTestShow"
+              ref="samePicTestPopNew"
+              v-model="samePicTestShowNew"
               placement="left"
               title="相似图片"
               width="200"
@@ -142,6 +189,15 @@
             <get-position-from-map
               v-model="formData.lat_lng"
               style="width: 100%; height: 400px;"
+            />
+          </el-form-item>
+          <el-form-item
+            label="作者"
+            prop="author"
+          >
+            <el-input
+              v-model="formData.author"
+              type="text"
             />
           </el-form-item>
           <el-form-item
@@ -201,19 +257,19 @@
           >
             <uploader
               ref="picUploadForEdit"
-              v-popover:samePicTestPop
+              v-popover:samePicTestPopEdit
               :upload-url="uploadUrl"
               :file-list-of-uploader.sync="uploaderFile.newOne"
-              :file-list="[{url: picAddr + formData.pic_key + '?preview=1&scale=10'}]"
+              :file-list="[{url: picAddr + formData.pic_key + '?preview=1&width=200&watermark=false'}]"
               :limit="1"
               :headers="{authorization: $store.state.auth.token}"
               :on-success-call="uploadSuccessHandleForNew"
-              @change="uploaderFileChangeHandle(formData, ...arguments)"
+              @change="uploaderFileChangeHandle(formData, ...arguments, 'edit')"
             />
 
             <el-popover
-              ref="samePicTestPop"
-              v-model="samePicTestShow"
+              ref="samePicTestPopEdit"
+              v-model="samePicTestShowEdit"
               placement="left"
               title="相似图片"
               width="200"
@@ -321,6 +377,15 @@
             <get-position-from-map
               v-model="formData.lat_lng"
               style="width: 100%; height: 400px;"
+            />
+          </el-form-item>
+          <el-form-item
+            label="作者"
+            prop="author"
+          >
+            <el-input
+              v-model="formData.author"
+              type="text"
             />
           </el-form-item>
           <el-form-item
@@ -381,9 +446,10 @@ import EXIF from 'exif-js'
 import GetPositionFromMap from '@/base-lib/components/GeoMap/GetPositionFromMap'
 import SelectWithRemoteSearch from '@/base-lib/components/selectWithRemoteSearch/selectWithRemoteSearch'
 import {picAddr} from '@/constant'
-import {getPic, getPicById} from '@/api'
+import {getPic, getPicById, updatePic} from '@/api'
 import dayjs from 'dayjs'
 import {picDHash} from '@/views/utils/picDHash'
+import statusMap from '@/constant/itemStatusMap'
 
 window.dayjs = dayjs
 export default {
@@ -391,7 +457,12 @@ export default {
   components: {SelectWithRemoteSearch, GetPositionFromMap, Uploader, ManageTable},
   data() {
     return {
-      samePicTestShow: false,
+      statusMap,
+      filter: {
+        item_status: ''
+      },
+      samePicTestShowNew: false,
+      samePicTestShowEdit: false,
       samePicTestResult: '',
       samePicDistance: '',
       picAddr,
@@ -404,7 +475,7 @@ export default {
           nodeExpress: function (h, val) {
             return h('el-image', {
               props: {
-                src: config.baseURL + '/retrieve-file/' + val + '?preview=1&width=200',
+                src: config.baseURL + '/retrieve-file/' + val + '?preview=1&width=200&watermark=false',
                 lazy: true,
                 fit: 'cover'
               },
@@ -423,12 +494,23 @@ export default {
           label: '拍摄时间'
         },
         {
+          prop: 'author',
+          label: '作者'
+        },
+        {
           prop: 'pic_description',
           label: '图片描述'
         },
         {
           prop: 'copyright_description',
           label: '版权说明'
+        },
+        {
+          prop: 'item_status',
+          label: '状态',
+          textContent: function (val) {
+            return statusMap[val]
+          }
         }
       ],
       uploaderFile: {
@@ -441,7 +523,45 @@ export default {
       }
     }
   },
+  computed: {
+    computedFilter: function () {
+      if(this.filter.item_status === '') {
+        return {}
+      }
+      return this.filter
+    }
+  },
   methods: {
+    disablePics() {
+      const selected = this.$refs.manager.innerComponentStatus.table.selected
+      const ld = this.$loading()
+      selected.forEach(item => {
+        updatePic({
+          id: item.id,
+          item_status: '0'
+        })
+        item.item_status = '0'
+      })
+      ld.close()
+    },
+    enablePics() {
+      const selected = this.$refs.manager.innerComponentStatus.table.selected
+      const ld = this.$loading()
+      selected.forEach(item => {
+        updatePic({
+          id: item.id,
+          item_status: '1'
+        })
+        item.item_status = '1'
+      })
+      ld.close()
+    },
+    clearSamePicTestResult() {
+      this.samePicTestResult = ''
+      this.samePicDistance = ''
+      this.samePicTestShowNew = false
+      this.samePicTestShowEdit = false
+    },
     beforeEditOpenHandle(data) {
       const loading = this.$loading()
       return new Promise((resolve) => {
@@ -492,6 +612,7 @@ export default {
         time_stage: [],
         collection: [],
         tag: [],
+        author: '暂无',
         d_hash: 0
       }
     },
@@ -519,7 +640,7 @@ export default {
         resolve(tmp)
       })
     },
-    uploaderFileChangeHandle(fd, file) {
+    uploaderFileChangeHandle(fd, file, type) {
       const fileReader = new FileReader()
       fileReader.onloadend = (e) => {
         picDHash(e.target.result).then(res => {
@@ -531,8 +652,13 @@ export default {
             order_by: 'hd'
           }).then(re => {
             if(re.data.data.rows.length > 0) {
-              this.samePicTestResult = config.baseURL + '/retrieve-file/' + re.data.data.rows[0].pic_key + '?preview=1&scale=10'
-              this.samePicTestShow = true
+              this.samePicTestResult = config.baseURL + '/retrieve-file/' + re.data.data.rows[0].pic_key + '?preview=1&width=200&watermark=false'
+              if(type === 'edit') {
+                this.samePicTestShowEdit = true
+              } else {
+                this.samePicTestShowNew = true
+              }
+
               this.samePicDistance = re.data.data.rows[0].hd
             } else {
               this.samePicTestResult = ''

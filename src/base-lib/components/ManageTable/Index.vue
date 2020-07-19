@@ -138,6 +138,8 @@
       :width="newOneDialogWidth"
       :title="dialogTitle.newOne"
       :visible.sync="dialogStatus.newOne"
+      @open="newOneDialogOpen"
+      @close="newOneDialogClose"
     >
       <slot
         name="newOneForm"
@@ -153,7 +155,10 @@
             :key="index"
             :label="field.label"
           >
-            <el-input v-model="innerFormDataTemp.newOne[field.prop]" />
+            <el-input
+              v-model="innerFormDataTemp.newOne[field.prop]"
+              :type="innerFormDataTemp.newOne[field.prop] && innerFormDataTemp.newOne[field.prop].length > 80 ? 'textarea':'text'"
+            />
           </el-form-item>
         </el-form>
       </slot>
@@ -176,6 +181,8 @@
       :width="editDialogWidth"
       :title="dialogTitle.edit"
       :visible.sync="dialogStatus.edit"
+      @open="editDialogOpen()"
+      @close="editDialogClose()"
     >
       <slot
         name="editForm"
@@ -193,7 +200,7 @@
           >
             <el-input
               v-model="innerFormDataTemp.edit[field.prop]"
-              :type="innerFormDataTemp.edit[field.prop] && innerFormDataTemp.edit[field.prop].length < 80 ? 'text':'textarea'"
+              :type="innerFormDataTemp.edit[field.prop] && innerFormDataTemp.edit[field.prop].length > 80 ? 'textarea':'text'"
             />
           </el-form-item>
         </el-form>
@@ -311,6 +318,26 @@ export default {
         this.newOneFormConfirmHandle()
       }
     },
+    newOneDialogOpen: {
+      type: Function,
+      default() {}
+    },
+    editDialogOpen: {
+      type: Function,
+      default() {}
+    },
+    newOneDialogClose: {
+      type: Function,
+      default() {
+        console.log('default close')
+      }
+    },
+    editDialogClose: {
+      type: Function,
+      default() {
+        console.log('default close')
+      }
+    },
     // 编辑对话款的宽度
     editDialogWidth: {
       type: String,
@@ -418,6 +445,12 @@ export default {
     dataSrcUrl: {
       type: String,
       required: true
+    },
+    extraParams: {
+      type: Object,
+      default() {
+        return {}
+      }
     },
     /**
      * 构建网络请求器
@@ -609,10 +642,17 @@ export default {
     dataSrcUrl: {
       handler(val, oldVal) {
         if(val !== oldVal) {
-          this.axiosRequester.defaults.url = val
+          this.innerComponentStatus.pagination.currentPage = 1
           this.formDataRequest()
         }
       }
+    },
+    extraParams: {
+      handler() {
+        this.innerComponentStatus.pagination.currentPage = 1
+        this.formDataRequest()
+      },
+      deep: true
     }
   },
   beforeMount() {
@@ -794,8 +834,10 @@ export default {
       this.innerComponentStatus.table.loading = true
       const pagination = this.innerComponentStatus.pagination
       this.axiosRequester.request({
+        url: this.dataSrcUrl,
         params: {
-          ...this.constructPageParams(pagination)
+          ...this.constructPageParams(pagination),
+          ...this.extraParams
         }
       }).then(res => {
         this.sourceData = res
