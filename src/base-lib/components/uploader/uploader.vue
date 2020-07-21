@@ -12,6 +12,7 @@
       :on-progress="showLoading"
       :on-success="onSuccess"
       :on-change="uploaderFileChangeHandle"
+      :data="extraData"
       :limit="limit"
     >
       <i class="el-icon-plus" />
@@ -26,6 +27,7 @@
       :on-success="onSuccess"
       :on-progress="showLoading"
       :on-change="uploaderFileChangeHandle"
+      :data="extraData"
     >
       <img
         v-if="files.length > 0"
@@ -47,6 +49,12 @@ export default {
   name: 'Uploader',
   props: {
     headers: {
+      type: Object,
+      default() {
+        return {}
+      }
+    },
+    extraData: {
       type: Object,
       default() {
         return {}

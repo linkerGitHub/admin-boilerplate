@@ -227,7 +227,7 @@ import tableDataProcessor from '../../utils/table-data-processor'
 import Axios from 'axios'
 
 export default {
-  name: 'Index',
+  name: 'ManageTable',
   components: {
     // 渲染函数
     VNodeRender: {

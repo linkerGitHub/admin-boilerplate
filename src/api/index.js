@@ -65,3 +65,12 @@ export function getCollectionById(id) {
     url: '/collection/'+id
   }).request({})
 }
+
+export function updatePic(data) {
+  return createAxios({
+    method: 'put',
+    url: '/pic'
+  }).request({
+    data
+  })
+}

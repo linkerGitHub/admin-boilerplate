@@ -96,7 +96,7 @@
 </template>
 
 <script>
-import ManageTable from '@/base-lib/components/ManageTable/Index.vue'
+import ManageTable from '@/base-lib/components/ManageTable/ManageTable.vue'
 import SelectWithRemoteSearch from '@/base-lib/components/selectWithRemoteSearch/selectWithRemoteSearch'
 import {getCollectionById} from '@/api'
 export default {

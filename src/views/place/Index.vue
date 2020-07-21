@@ -108,7 +108,7 @@
 </template>
 
 <script>
-import ManageTable from '@/base-lib/components/ManageTable/Index.vue'
+import ManageTable from '@/base-lib/components/ManageTable/ManageTable.vue'
 import {getStreet} from '@/api'
 import MapBoundaryDraw from '@/base-lib/components/GeoMap/MapBoundaryDraw'
 import {convertBorder} from '@/base-lib/components/GeoMap/js/ConvertBorder2Arr'

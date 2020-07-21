@@ -259,11 +259,11 @@
               ref="picUploadForEdit"
               v-popover:samePicTestPopEdit
               :upload-url="uploadUrl"
-              :file-list-of-uploader.sync="uploaderFile.newOne"
+              :file-list-of-uploader.sync="uploaderFile.edit"
               :file-list="[{url: picAddr + formData.pic_key + '?preview=1&width=200&watermark=false'}]"
               :limit="1"
               :headers="{authorization: $store.state.auth.token}"
-              :on-success-call="uploadSuccessHandleForNew"
+              :on-success-call="uploadSuccessHandleForEdit"
               @change="uploaderFileChangeHandle(formData, ...arguments, 'edit')"
             />
 
@@ -439,7 +439,7 @@
 </template>
 
 <script>
-import ManageTable from '@/base-lib/components/ManageTable/Index.vue'
+import ManageTable from '@/base-lib/components/ManageTable/ManageTable.vue'
 import config from '@/base-lib/utils/axios/config'
 import Uploader from '@/base-lib/components/uploader/uploader'
 import EXIF from 'exif-js'
@@ -596,6 +596,10 @@ export default {
       this.tmp.newOneData.pic_key = res.data._id.$oid
       this.$refs.manager.newOneFormConfirmHandle()
     },
+    uploadSuccessHandleForEdit(res) {
+      this.tmp.editData.pic_key = res.data._id.$oid
+      this.$refs.manager.editOneFormConfirmHandle()
+    },
     dataShaper() {
       return {
         copyright_description: '暂无',
@@ -677,6 +681,7 @@ export default {
           const tempDateStr = info.DateTime.split(' ')
           datetimeStr = tempDateStr[0].split(':').join('-') + ' ' + tempDateStr[1]
         }
+        console.log(datetimeStr)
         fd.pic_shot_time = dayjs(datetimeStr).format('YYYY-MM-DD HH:mm:ss')
         fd.copyright_description = info.Copyright || '暂无'
         if(info.PixelXDimension && info.PixelYDimension) {

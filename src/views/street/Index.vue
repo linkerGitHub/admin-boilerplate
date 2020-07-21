@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import ManageTable from '@/base-lib/components/ManageTable/Index.vue'
+import ManageTable from '@/base-lib/components/ManageTable/ManageTable.vue'
 import GetPositionFromMap from '@/base-lib/components/GeoMap/GetPositionFromMap'
 export default {
   name: 'Index',

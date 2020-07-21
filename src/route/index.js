@@ -60,6 +60,13 @@ export const routes = [
         meta: {
           title: '用户'
         }
+      },
+      {
+        path: 'back-img',
+        component: () => import('@/views/backImg/Index'),
+        meta: {
+          title: '背景图片'
+        }
       }
     ]
   },
