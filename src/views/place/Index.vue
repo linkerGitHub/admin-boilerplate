@@ -10,8 +10,30 @@
       :edit-success="() => {$store.dispatch('reloadPlace')}"
       :save-success="() => {$store.dispatch('reloadPlace')}"
       edit-dialog-width="90%"
+      :extra-params="filter"
       new-one-dialog-width="90%"
     >
+      <template v-slot:searchBar>
+        <el-row
+          style="text-align: right;"
+        >
+          <el-form inline>
+            <el-select
+              v-model="filter.item_usage_mark"
+              size="small"
+            >
+              <el-option
+                :value="undefined"
+                label="所有"
+              />
+              <el-option
+                :value="'index'"
+                label="首页显示"
+              />
+            </el-select>
+          </el-form>
+        </el-row>
+      </template>
       <template v-slot:newOneForm="{ formData }">
         <el-form
           :model="formData"
@@ -43,6 +65,23 @@
                 :key="st.id"
                 :label="st.street_name"
                 :value="st"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            label="是否首页显示："
+            prop="item_usage_mark"
+          >
+            <el-select
+              v-model="formData.item_usage_mark"
+            >
+              <el-option
+                label="是"
+                value="index"
+              />
+              <el-option
+                label="否"
+                value=""
               />
             </el-select>
           </el-form-item>
@@ -92,6 +131,23 @@
             </el-select>
           </el-form-item>
           <el-form-item
+            label="是否首页显示："
+            prop="item_usage_mark"
+          >
+            <el-select
+              v-model="formData.item_usage_mark"
+            >
+              <el-option
+                label="是"
+                value="index"
+              />
+              <el-option
+                label="否"
+                value=""
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item
             label="地理坐标"
             prop="lat_lng"
           >
@@ -118,6 +174,9 @@ export default {
   components: {MapBoundaryDraw, ManageTable},
   data() {
     return {
+      filter: {
+        item_usage_mark: undefined
+      },
       def: [
         {
           prop: 'place_name',
@@ -138,6 +197,13 @@ export default {
             }).join(',')
           },
           editable: true
+        },
+        {
+          prop: 'item_usage_mark',
+          label: '是否首页显示',
+          textContent: function (val) {
+            return val === 'index' ? '是' : '否'
+          }
         }
       ],
       dataSrc: {

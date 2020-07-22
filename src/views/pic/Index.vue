@@ -13,7 +13,7 @@
       :axios-requester="$genAxiosInstanceFn()"
       :edit-dialog-close="clearSamePicTestResult"
       :new-one-dialog-close="clearSamePicTestResult"
-      :extra-params="computedFilter"
+      :extra-params="filter"
     >
       <template v-slot:searchBar>
         <el-row>
@@ -45,8 +45,8 @@
                 size="small"
               >
                 <el-option
-                  :value="''"
-                  label="所有"
+                  :value="undefined"
+                  label="所有状态"
                 />
                 <el-option
                   v-for="(s, k) of statusMap"
@@ -459,7 +459,7 @@ export default {
     return {
       statusMap,
       filter: {
-        item_status: ''
+        item_status: undefined
       },
       samePicTestShowNew: false,
       samePicTestShowEdit: false,
@@ -524,12 +524,7 @@ export default {
     }
   },
   computed: {
-    computedFilter: function () {
-      if(this.filter.item_status === '') {
-        return {}
-      }
-      return this.filter
-    }
+
   },
   methods: {
     disablePics() {

@@ -7,8 +7,29 @@
       :edit-deal="editDeal"
       :new-one-deal="editDeal"
       :data-shaper="dataShaper"
+      :extra-params="filter"
       :before-edit-dialog-open="beforeEditOpenHandle"
     >
+      <template v-slot:searchBar>
+        <el-row
+          style="text-align: right;">
+          <el-form inline>
+            <el-select
+              v-model="filter.item_usage_mark"
+              size="small"
+            >
+              <el-option
+                :value="undefined"
+                label="所有"
+              />
+              <el-option
+                :value="'index'"
+                label="首页显示"
+              />
+            </el-select>
+          </el-form>
+        </el-row>
+      </template>
       <template v-slot:newOneForm="{ formData }">
         <el-form
           :model="formData"
@@ -47,6 +68,23 @@
               data-src-url="/tag"
               label-key="tag_name"
             />
+          </el-form-item>
+          <el-form-item
+            label="是否首页显示："
+            prop="item_usage_mark"
+          >
+            <el-select
+              v-model="formData.item_usage_mark"
+            >
+              <el-option
+                label="是"
+                value="index"
+              />
+              <el-option
+                label="否"
+                value=""
+              />
+            </el-select>
           </el-form-item>
         </el-form>
       </template>
@@ -89,6 +127,23 @@
               label-key="tag_name"
             />
           </el-form-item>
+          <el-form-item
+            label="是否首页显示："
+            prop="item_usage_mark"
+          >
+            <el-select
+              v-model="formData.item_usage_mark"
+            >
+              <el-option
+                label="是"
+                value="index"
+              />
+              <el-option
+                label="否"
+                value=""
+              />
+            </el-select>
+          </el-form-item>
         </el-form>
       </template>
     </manage-table>
@@ -104,6 +159,9 @@ export default {
   components: {SelectWithRemoteSearch, ManageTable},
   data() {
     return {
+      filter: {
+        item_usage_mark: undefined
+      },
       def: [
         {
           prop: 'collection_name',
@@ -124,6 +182,13 @@ export default {
           label: '是否系统数据',
           textContent: function (val) {
             return val === 1 ? '否' : '是'
+          }
+        },
+        {
+          prop: 'item_usage_mark',
+          label: '是否首页显示',
+          textContent: function (val) {
+            return val === 'index' ? '是' : '否'
           }
         }
       ],

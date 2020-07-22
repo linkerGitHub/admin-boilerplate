@@ -20,4 +20,7 @@ export default {
 #app {
   color: #4A4A4A;
 }
+  body{
+    overflow: auto;
+  }
 </style>
