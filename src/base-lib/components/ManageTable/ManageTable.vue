@@ -688,8 +688,8 @@ export default {
           type: 'warning'
         }).then(() => {
           this.deleteDeal(this.innerComponentStatus.table.selected).then(res => {
-            console.log(res)
             this.axiosRequester.request({
+              url: this.dataSrcUrl,
               method: 'delete',
               ...res
             }).then(re => {
@@ -718,6 +718,7 @@ export default {
     // 保存新增网络请求
     newOneSaveReq(res) {
       this.axiosRequester.request({
+        url: this.dataSrcUrl,
         method: 'post',
         data: res
       }).then(ret => {
@@ -733,6 +734,7 @@ export default {
     // 保存编辑网络请求
     editSaveReq(res) {
       this.axiosRequester.request({
+        url: this.dataSrcUrl,
         method: 'put',
         data: res
       }).then(ret => {
