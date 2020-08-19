@@ -173,6 +173,7 @@
               v-model="formData.place"
               value-key="id"
               multiple
+              @change="setMapKeyword('positionMapForNew', formData.place)"
             >
               <el-option
                 v-for="op in $store.state.dataSrc.place"
@@ -181,12 +182,77 @@
                 :value="op"
               />
             </el-select>
+            <el-popover
+              v-model="createPlacePopoverShow"
+              placement="bottom"
+              title="添加地点"
+              width="200"
+              trigger="click"
+            >
+              <template v-slot:default>
+                <el-form size="mini">
+                  <el-form-item
+                    prop="place_name"
+                  >
+                    <el-input
+                      v-model="createPlace.place_name"
+                      placeholder="位置名称"
+                    />
+                  </el-form-item>
+                  <el-form-item
+                    prop="place_id"
+                  >
+                    <el-input
+                      v-model="createPlace.place_id"
+                      placeholder="位置代码"
+                    />
+                  </el-form-item>
+                  <el-form-item
+                    prop="street"
+                  >
+                    <el-select
+                      v-model="createPlace.street"
+                      style="width: 100%;"
+                      multiple
+                      value-key="id"
+                      size="mini"
+                      placeholder="街道"
+                    >
+                      <el-option
+                        v-for="st in $store.state.dataSrc.street"
+                        :key="st.id"
+                        :label="st.street_name"
+                        :value="st"
+                      />
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item style="text-align: right;">
+                    <el-button
+                      type="primary"
+                      size="mini"
+                      @click="createPlaceAction"
+                    >
+                      确定
+                    </el-button>
+                  </el-form-item>
+                </el-form>
+              </template>
+              <el-button
+                slot="reference"
+                circle
+                icon="el-icon-plus"
+                type="primary"
+                plain
+                style="margin-left: 10px"
+              />
+            </el-popover>
           </el-form-item>
           <el-form-item
             label="地理坐标"
             prop="lat_lng"
           >
             <get-position-from-map
+              ref="positionMapForNew"
               v-model="formData.lat_lng"
               style="width: 100%; height: 400px;"
             />
@@ -361,6 +427,7 @@
               v-model="formData.place"
               value-key="id"
               multiple
+              @change="setMapKeyword('positionMapForEdit', formData.place)"
             >
               <el-option
                 v-for="op in $store.state.dataSrc.place"
@@ -369,12 +436,77 @@
                 :value="op"
               />
             </el-select>
+            <el-popover
+              v-model="createPlacePopoverShowForEdit"
+              placement="bottom"
+              title="添加地点"
+              width="200"
+              trigger="click"
+            >
+              <template v-slot:default>
+                <el-form size="mini">
+                  <el-form-item
+                    prop="place_name"
+                  >
+                    <el-input
+                      v-model="createPlace.place_name"
+                      placeholder="位置名称"
+                    />
+                  </el-form-item>
+                  <el-form-item
+                    prop="place_id"
+                  >
+                    <el-input
+                      v-model="createPlace.place_id"
+                      placeholder="位置代码"
+                    />
+                  </el-form-item>
+                  <el-form-item
+                    prop="street"
+                  >
+                    <el-select
+                      v-model="createPlace.street"
+                      style="width: 100%;"
+                      multiple
+                      value-key="id"
+                      size="mini"
+                      placeholder="街道"
+                    >
+                      <el-option
+                        v-for="st in $store.state.dataSrc.street"
+                        :key="st.id"
+                        :label="st.street_name"
+                        :value="st"
+                      />
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item style="text-align: right;">
+                    <el-button
+                      type="primary"
+                      size="mini"
+                      @click="createPlaceAction"
+                    >
+                      确定
+                    </el-button>
+                  </el-form-item>
+                </el-form>
+              </template>
+              <el-button
+                slot="reference"
+                circle
+                icon="el-icon-plus"
+                type="primary"
+                plain
+                style="margin-left: 10px"
+              />
+            </el-popover>
           </el-form-item>
           <el-form-item
             label="地理坐标"
             prop="lat_lng"
           >
             <get-position-from-map
+              ref="positionMapForEdit"
               v-model="formData.lat_lng"
               style="width: 100%; height: 400px;"
             />
@@ -446,7 +578,7 @@ import EXIF from 'exif-js'
 import GetPositionFromMap from '@/base-lib/components/GeoMap/GetPositionFromMap'
 import SelectWithRemoteSearch from '@/base-lib/components/selectWithRemoteSearch/selectWithRemoteSearch'
 import {picAddr} from '@/constant'
-import {getPic, getPicById, updatePic} from '@/api'
+import {createPlace, getPic, getPicById, updatePic} from '@/api'
 import dayjs from 'dayjs'
 import {picDHash} from '@/views/utils/picDHash'
 import statusMap from '@/constant/itemStatusMap'
@@ -457,6 +589,14 @@ export default {
   components: {SelectWithRemoteSearch, GetPositionFromMap, Uploader, ManageTable},
   data() {
     return {
+      createPlace: {
+        place_mame: '',
+        place_id: '',
+        street: [],
+        place_name: '',
+        lat_lng: '[]',
+        border: ''
+      },
       statusMap,
       filter: {
         item_status: undefined
@@ -520,13 +660,32 @@ export default {
       tmp: {
         newOneData: {},
         editData: {}
-      }
+      },
+      createPlacePopoverShow: false,
+      createPlacePopoverShowForEdit: false
     }
   },
-  computed: {
-
-  },
   methods: {
+    setMapKeyword(ref, data) {
+      const map =this.$refs[ref]
+      if(data.length > 0) {
+        map.posSearchVal = data[data.length - 1].place_name
+      } else {
+        map.posSearchVal = ''
+      }
+      map.posSuggestListReq()
+    },
+    createPlaceAction() {
+      const tmp = JSON.parse(JSON.stringify(this.createPlace))
+      tmp.street = tmp.street.map(s => {
+        return s.id
+      })
+      // eslint-disable-next-line no-unused-vars
+      createPlace(tmp).then(_ => {
+        this.$store.dispatch('reloadPlace')
+      })
+      this.createPlacePopoverShow = false
+    },
     disablePics() {
       const selected = this.$refs.manager.innerComponentStatus.table.selected
       const ld = this.$loading()

@@ -27,6 +27,15 @@ export function getPlace(params) {
   })
 }
 
+export function createPlace(data) {
+  return createAxios({
+    method: 'post',
+    url: '/place'
+  }).request({
+    data
+  })
+}
+
 export function getTimeStage(params) {
   return createAxios({
     method: 'get',
