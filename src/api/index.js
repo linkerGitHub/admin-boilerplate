@@ -83,3 +83,12 @@ export function updatePic(data) {
     data
   })
 }
+
+export function modifyPass(data) {
+  return createAxios({
+    method: 'put',
+    url: '/admin/password'
+  }).request({
+    data
+  })
+}

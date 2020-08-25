@@ -67,6 +67,13 @@ export const routes = [
         meta: {
           title: '背景图片'
         }
+      },
+      {
+        path: 'modify-admin',
+        component: () => import('@/views/modifyPassword/Index'),
+        meta: {
+          title: '修改账户'
+        }
       }
     ]
   },
