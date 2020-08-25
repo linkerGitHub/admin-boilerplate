@@ -64,6 +64,20 @@ import translation from './js/leaflet-geoman-translation'
 require('leaflet.chinatmsproviders')
 require('@geoman-io/leaflet-geoman-free')
 
+
+L.TileLayer.ChinaProvider.providers.Google = {
+  Normal: {
+    Map: '//{s}.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}'
+  },
+  Satellite: {
+    Map: '//{s}.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}',
+    Annotion: '//{s}.google.cn/maps/vt?lyrs=y@189&gl=cn&x={x}&y={y}&z={z}'
+  },
+  Subdomains: [
+    'mt2', 'mt3', 'mt1', 'mt0'
+  ]
+}
+
 export default {
   name: 'MapForEdit',
   props: {
