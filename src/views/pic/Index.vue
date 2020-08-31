@@ -616,8 +616,8 @@ export default {
             return h('el-image', {
               props: {
                 src: config.baseURL + '/retrieve-file/' + val + '?preview=1&width=200&watermark=false',
-                lazy: true,
-                fit: 'cover'
+                fit: 'cover',
+                previewSrcList: [config.baseURL + '/retrieve-file/' + val + '?preview=1&width=780&watermark=false']
               },
               style: {
                 'min-width': '200px'
