@@ -6,6 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "build:aliyun": "vue-cli-service build --mode pro_dev_aliyun",
+    "build:docker": "vue-cli-service build --mode docker",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

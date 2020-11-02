@@ -8,8 +8,10 @@ switch (process.env.VUE_APP_MY_ENV) {
 case 'aliyun':
   useCfg = cfgMainland
   break
+case 'docker':
+  useCfg = JSON.parse(process.env.IDX_APP_CONFIG)
+  break
 default:
-  console.log(process.env.NODE_ENV)
   if(process.env.NODE_ENV === 'production') {
     useCfg = cfgOnline
   }
