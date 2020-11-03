@@ -1,5 +1,6 @@
 const IdxConfig = {
-  serverUrl: 'http://localhost:8080'
+  // serverUrl: 'http://localhost:8080'
+  serverUrl: 'http://dev_api_mainland.idxstudio.win/jinniu_dfz_tupianku'
 }
 
 const IdxConfigOnline = {
