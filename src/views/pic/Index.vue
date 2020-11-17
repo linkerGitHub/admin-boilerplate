@@ -285,11 +285,9 @@
             label="拍摄（制作）时间"
             prop="pic_shot_time"
           >
-            <el-date-picker
+            <el-input
               v-model="formData.pic_shot_time"
-              type="datetime"
-              value-format="yyyy-MM-dd HH:mm:ss"
-              placeholder="选择日期时间"
+              maxlength="16"
             />
           </el-form-item>
           <el-form-item
