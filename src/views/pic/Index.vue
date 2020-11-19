@@ -625,7 +625,6 @@ export default {
           prop: 'pic_shot_time',
           label: '拍摄时间',
           textContent: (val) => {
-            console.log(Vue)
             return Vue.filter('picShotTimeDeal')(val)
           }
         },
