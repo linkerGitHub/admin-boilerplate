@@ -285,10 +285,7 @@
             label="拍摄（制作）时间"
             prop="pic_shot_time"
           >
-            <el-input
-              v-model="formData.pic_shot_time"
-              maxlength="16"
-            />
+            <custom-date-pick v-model="formData.pic_shot_time" />
           </el-form-item>
           <el-form-item
             label="版权说明"
@@ -537,10 +534,7 @@
             label="拍摄（制作）时间"
             prop="pic_shot_time"
           >
-            <el-input
-              v-model="formData.pic_shot_time"
-              maxlength="16"
-            />
+            <custom-date-pick v-model="formData.pic_shot_time" />
           </el-form-item>
           <el-form-item
             label="版权说明"
@@ -578,11 +572,13 @@ import {createPlace, getPic, getPicById, updatePic} from '@/api'
 import dayjs from 'dayjs'
 import {picDHash} from '@/views/utils/picDHash'
 import statusMap from '@/constant/itemStatusMap'
+import CustomDatePick from '@/base-lib/components/customDatePick'
+import Vue from 'vue'
 
 window.dayjs = dayjs
 export default {
   name: 'Index',
-  components: {SelectWithRemoteSearch, GetPositionFromMap, Uploader, ManageTable},
+  components: {CustomDatePick, SelectWithRemoteSearch, GetPositionFromMap, Uploader, ManageTable},
   data() {
     return {
       createPlace: {
@@ -627,7 +623,11 @@ export default {
         },
         {
           prop: 'pic_shot_time',
-          label: '拍摄时间'
+          label: '拍摄时间',
+          textContent: (val) => {
+            console.log(Vue)
+            return Vue.filter('picShotTimeDeal')(val)
+          }
         },
         {
           prop: 'author',
@@ -832,7 +832,7 @@ export default {
           datetimeStr = tempDateStr[0].split(':').join('-') + ' ' + tempDateStr[1]
         }
         console.log(datetimeStr)
-        fd.pic_shot_time = dayjs(datetimeStr).format('YYYY-MM-DD HH:mm:ss')
+        fd.pic_shot_time = dayjs(datetimeStr).format('YYYY年MM月DD日')
         fd.copyright_description = info.Copyright || '暂无'
         if(info.PixelXDimension && info.PixelYDimension) {
           fd.pic_size = info.PixelXDimension + 'x' + info.PixelYDimension
