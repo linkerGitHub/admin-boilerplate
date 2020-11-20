@@ -95,10 +95,17 @@ export default {
   },
   methods: {
     dateUpdated(prop, value) {
-      this.tmpDateSelected[prop] = value
+      const order = ['year', 'month', 'day']
+      const propIdx = order.findIndex(p => p === prop)
+      if(value === null || value === '') {
+        for(let i = propIdx; i < 3; i++) {
+          this.tmpDateSelected[order[i]] = null
+        }
+      } else {
+        this.tmpDateSelected[prop] = value
+      }
       const val = this.tmpDateSelected
       const dateVal = `${val.year ? val.year.getFullYear() + '年' : ''}${val.month ? val.month + '月' : ''}${val.day ? val.day + '日' : ''}`
-      console.log(dateVal)
       this.$emit('input', dateVal)
     }
   }
