@@ -296,7 +296,7 @@
               type="textarea"
             />
           </el-form-item>
-          <el-form-item
+          <!--<el-form-item
             label="肖像权/物权"
             prop="pic_thing_right"
           >
@@ -304,7 +304,7 @@
               v-model="formData.pic_thing_right"
               type="textarea"
             />
-          </el-form-item>
+          </el-form-item>-->
         </el-form>
       </template>
       <template v-slot:editForm="{ formData }">
@@ -545,7 +545,7 @@
               type="textarea"
             />
           </el-form-item>
-          <el-form-item
+          <!--<el-form-item
             label="肖像权/物权"
             prop="pic_thing_right"
           >
@@ -553,7 +553,7 @@
               v-model="formData.pic_thing_right"
               type="textarea"
             />
-          </el-form-item>
+          </el-form-item>-->
         </el-form>
       </template>
     </manage-table>
@@ -789,6 +789,7 @@ export default {
       tmp.time_stage = tmp.time_stage.map(item => {
         return item.id
       })
+      delete tmp.user
       return new Promise(resolve => {
         resolve(tmp)
       })
