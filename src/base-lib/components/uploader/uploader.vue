@@ -148,6 +148,7 @@ export default {
         this.$emit('update:fileListOfUploader', [file])
         this.$emit('change', file, [file])
         this.files = [file]
+        this.$refs.uploader.uploadFiles = this.files
       } else {
         this.$emit('update:fileListOfUploader', fileList)
         this.$emit('change', file, fileList)
