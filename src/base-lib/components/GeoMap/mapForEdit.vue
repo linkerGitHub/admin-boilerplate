@@ -170,11 +170,11 @@ export default {
     // 初始化地图
     initMap() {
       // 卫星瓦片地图与普通地图
-      const normalMap = L.tileLayer.chinaProvider('Google.Normal.Map', {
+      const normalMap = L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
         maxZoom: 21,
         minZoom: 5
       })
-      const routeMap = L.tileLayer.chinaProvider('Google.Satellite.Annotion', {
+      const routeMap = L.tileLayer.chinaProvider('GaoDe.Satellite.Annotion', {
         maxZoom: 21,
         minZoom: 5
       })
