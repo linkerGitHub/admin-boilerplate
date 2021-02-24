@@ -174,10 +174,15 @@ export default {
         maxZoom: 21,
         minZoom: 5
       })
-      const routeMap = L.tileLayer.chinaProvider('GaoDe.Satellite.Annotion', {
+      const satelliteImg = L.tileLayer.chinaProvider('GaoDe.Satellite.Map', {
+        maxZoom: 21,
+        minZoom: 5
+      });
+      const satelliteRouteMap = L.tileLayer.chinaProvider('GaoDe.Satellite.Annotion', {
         maxZoom: 21,
         minZoom: 5
       })
+      const routeMap = L.layerGroup([satelliteImg, satelliteRouteMap])
 
       this.baseLayer = {
         'normalMap': normalMap,
@@ -189,7 +194,7 @@ export default {
         attributionControl: false,
         center: this.initialCenter.reverse(),
         zoom: 17,
-        layers: [routeMap],
+        layers: routeMap,
         zoomControl: false
       })
       map.pm.setLang('zh-cus', translation)
